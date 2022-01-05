@@ -61,6 +61,7 @@ public class SQLiteManager {
                 ps.setInt(4, 0); // kills
                 ps.setInt(5, 0); // coins
 
+                plugin.getPlayerManager().addSkywarsPlayer(uuid);
 
                 ps.executeUpdate();
 

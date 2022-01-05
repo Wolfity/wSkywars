@@ -2,8 +2,9 @@ package me.wolf.wskywars.player;
 
 import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
@@ -14,6 +15,7 @@ public class SkywarsPlayer {
     private final UUID uuid;
     private int wins, kills, coins;
     private boolean isSpectator;
+    private PlayerState playerState;
 
     // creating a first time object
     public SkywarsPlayer(final UUID uuid) {
@@ -22,6 +24,7 @@ public class SkywarsPlayer {
         this.kills = 0;
         this.coins = 0;
         this.isSpectator = false;
+        this.playerState = PlayerState.IN_LOBBY;
     }
 
     public SkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins) {
@@ -30,6 +33,7 @@ public class SkywarsPlayer {
         this.wins = wins;
         this.kills = kills;
         this.isSpectator = false;
+        this.playerState = PlayerState.IN_LOBBY;
     }
 
     public UUID getUuid() {
@@ -68,6 +72,14 @@ public class SkywarsPlayer {
         isSpectator = spectator;
     }
 
+    public PlayerState getPlayerState() {
+        return playerState;
+    }
+
+    public void setPlayerState(PlayerState playerState) {
+        this.playerState = playerState;
+    }
+
     public String getName() {
         return getBukkitPlayer().getName();
     }
@@ -75,24 +87,34 @@ public class SkywarsPlayer {
     public Player getBukkitPlayer() {
         return Bukkit.getPlayer(uuid);
     }
+
     public void sendMessage(final String msg) {
         getBukkitPlayer().sendMessage(Utils.colorize(msg));
     }
+
     public void sendCenteredMessage(final String msg) {
         Utils.sendCenteredMessage(getBukkitPlayer(), msg);
     }
+
     public void sendCenteredMessage(final String[] msg) {
-        for(final String s : msg) {
+        for (final String s : msg) {
             sendCenteredMessage(s);
         }
     }
+
+    public Location getLocation() {
+        return getBukkitPlayer().getLocation();
+    }
+
     public PlayerInventory getInventory() {
         return getBukkitPlayer().getInventory();
     }
+
     public void setUpPlayer() {
         getBukkitPlayer().setFoodLevel(20);
         getBukkitPlayer().setSaturation(20);
     }
+
     public void clearArmor() {
         getInventory().setHelmet(null);
         getInventory().setChestplate(null);
@@ -100,10 +122,37 @@ public class SkywarsPlayer {
         getInventory().setBoots(null);
     }
 
+    public void teleport(final Location location) {
+        getBukkitPlayer().teleport(location);
+    }
+
     public void clearEffects() {
-        for(PotionEffect effect : getBukkitPlayer().getActivePotionEffects()) {
+        for (PotionEffect effect : getBukkitPlayer().getActivePotionEffects()) {
             getBukkitPlayer().removePotionEffect(effect.getType());
         }
+    }
+    public World getWorld() {
+        return getLocation().getWorld();
+    }
+
+    public double getX() {
+        return getLocation().getX();
+    }
+
+    public double getY() {
+        return getLocation().getY();
+    }
+
+    public double getZ() {
+        return getLocation().getZ();
+    }
+
+    public float getYaw() {
+        return getLocation().getYaw();
+    }
+
+    public float getPitch() {
+        return getLocation().getPitch();
     }
 
 }

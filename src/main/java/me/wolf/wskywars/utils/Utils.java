@@ -3,7 +3,7 @@ package me.wolf.wskywars.utils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-public class Utils {
+public final class Utils {
 
     public static String colorize(final String input) {
         return input == null ? "Null value" : ChatColor.translateAlternateColorCodes('&', input);

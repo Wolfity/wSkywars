@@ -23,6 +23,11 @@ public class PlayerManager {
         this.skywarsPlayers.put(uuid, new SkywarsPlayer(uuid));
     }
 
+    // remove a skywars player
+    public void removeSkywarsPlayer(final UUID uuid) {
+        this.skywarsPlayers.remove(uuid);
+    }
+
     /**
      * @param uuid: The UUID of the player we are going to load in
      * @param wins: The amount of wins stored by the UUID
