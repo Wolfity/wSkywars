@@ -1,91 +1,113 @@
 chest-items:
   '1':
     type: ISLAND
+    has-enchants: false
     material: DIAMOND_SWORD
     name: "&bDia Sword"
     amount: 1
   '2':
     type: ISLAND
+    has-enchants: false
     material: COOKED_BEEF
     name: "&cRare Steak"
     amount: 8
   '3':
     type: ISLAND
+    has-enchants: false
     material: LEATHER_CHESTPLATE
     name: Leather ChestPlate
     amount: 1
   '4':
     type: ISLAND
+    has-enchants: false
     material: CHAINMAIL_BOOTS
     name: "Chain Boots"
     amount: 1
   '5':
     type: ISLAND
+    has-enchants: false
     material: IRON_LEGGINGS
     name: "Iron Leggings"
     amount: 1
   '6':
     type: ISLAND
+    has-enchants: false
     material: GOLDEN_HELMET
     name: "Golden Helmet"
     amount: 1
   '7':
     type: ISLAND
+    has-enchants: false
     material: IRON_SWORD
     name: "&cIron Stick"
     amount: 1
   '8':
     type: ISLAND
+    has-enchants: false
     material: COBBLESTONE
     name: ""
     amount: 16
   '9':
     type: ISLAND
+    has-enchants: false
     material: OAK_PLANKS
     name: ""
     amount: 32
   '10':
     type: ISLAND
+    has-enchants: false
     material: FISHING_ROD
     name: "&aRod"
     amount: 1
   '11':
     type: MID
+    has-enchants: true
+    enchants: DURABILITY:5;PROTECTION_ENVIRONMENTAL:1
     material: DIAMOND_BOOTS
     name: "&bTanky Boots"
     amount: 1
   '12':
     type: MID
+    has-enchants: true
+    enchants: DURABILITY:5;PROTECTION_ENVIRONMENTAL:1
     material: DIAMOND_LEGGINGS
     name: "&bTanky Leggings"
     amount: 1
   '13':
     type: MID
+    has-enchants: true
+    enchants: DURABILITY:5;PROTECTION_ENVIRONMENTAL:1
     material: "DIAMOND_CHESTPLATE"
     name: "&bTanky ChestPlate"
     amount: 1
   '14':
     type: MID
+    has-enchants: true
+    enchants: DURABILITY:5;PROTECTION_ENVIRONMENTAL:1
     material: "DIAMOND_HELMET"
     name: "&bTanky Helmet"
     amount: 1
   '15':
     type: MID
+    has-enchants: false
     material: ENDER_PEARL
     name: ""
     amount: 2
   '16':
     type: MID
+    has-enchants: false
     material: GOLDEN_APPLE
     name: ""
     amount: 2
   '17':
     type: ISLAND
+    has-enchants: false
     material: IRON_PICKAXE
     name: ""
     amount: 1
   '18':
     type: ISLAND
+    has-enchants: false
     material: STONE_AXE
     name: ""
     amount: 1

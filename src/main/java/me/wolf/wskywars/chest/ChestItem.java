@@ -1,27 +1,19 @@
 package me.wolf.wskywars.chest;
 
-import me.wolf.wskywars.utils.ItemUtils;
-import me.wolf.wskywars.utils.Utils;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 public class ChestItem {
 
     private final ChestType chestType;
-    private final int amount;
-    private final Material material;
-    private final String name;
+    private final ItemStack item;
 
-    public ChestItem(final ChestType chestType, final int amount, final Material material, final String name) {
+    public ChestItem(final ChestType chestType, final ItemStack item) {
         this.chestType = chestType;
-        this.amount = amount;
-        this.material = material;
-        this.name = Utils.colorize(name);
-
+        this.item = item;
     }
 
     public ItemStack getItem() {
-        return ItemUtils.createItem(material, name, amount);
+        return item;
     }
 
     public ChestType getChestType() {

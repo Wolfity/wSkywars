@@ -3,18 +3,19 @@ package me.wolf.wskywars.chest;
 import me.wolf.wskywars.arena.Arena;
 import me.wolf.wskywars.files.YamlConfig;
 import me.wolf.wskywars.game.Game;
+import me.wolf.wskywars.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SkywarsChestManager {
 
-    private Set<ChestItem> chestItems = new HashSet<>();
+    private final Set<ChestItem> chestItems = new HashSet<>();
 
     /**
      * Loads in all chest items from the config file
@@ -26,7 +27,19 @@ public class SkywarsChestManager {
             final String name = cfg.getConfig().getString("chest-items." + s + ".name");
             final ChestType chestType = ChestType.valueOf(cfg.getConfig().getString("chest-items." + s + ".type"));
             final int amount = cfg.getConfig().getInt("chest-items." + s + ".amount");
-            chestItems.add(new ChestItem(chestType, amount, material, name));
+            final boolean hasEnchants = cfg.getConfig().getBoolean("chest-items." + s + ".has-enchants");
+            if (!hasEnchants) {
+                chestItems.add(new ChestItem(chestType, ItemUtils.createItem(material, name, amount)));
+            } else {
+                final String ench = cfg.getConfig().getString("chest-items." + s + ".enchants");
+                final String[] splitEnch = ench.split(";"); // string looks like -> DURABILITY:5 SHARPNESS:3
+                final ItemStack is = ItemUtils.createItem(material, name, amount);
+                for (final String enchantment : splitEnch) {
+                    final String[] finalData = enchantment.split(":"); // string is split up and looks like DURABILITY 5
+                    is.addUnsafeEnchantment(Objects.requireNonNull(Enchantment.getByName(finalData[0])), Integer.parseInt(finalData[1]));
+                }
+                chestItems.add(new ChestItem(chestType, is));
+            }
         }
 
     }
@@ -43,18 +56,26 @@ public class SkywarsChestManager {
             final Chest chest = (Chest) skywarsChest.getLocation().getBlock().getState();
 
             for (int i = 0; i < skywarsChest.getItemsPerChest(); i++) {
-                chest.getInventory().setItem(getRandomSlot(chest.getInventory()), getRandomItem().getItem());
+                chest.getInventory().setItem(getRandomSlot(chest.getInventory()), getRandomItem(skywarsChest.getChestType()).getItem());
             }
 
         });
     }
 
-
-    private ChestItem getRandomItem() {
-        final int randomIndex = new Random().nextInt(chestItems.size());
-        return new ArrayList<>(chestItems).get(randomIndex);
+    /**
+     * @param chestType Island Chest or Mid Chest
+     * @return a random item from the specified chest type
+     */
+    private ChestItem getRandomItem(final ChestType chestType) {
+        final List<ChestItem> chestItemList = chestItems.stream().filter(chestItem -> chestItem.getChestType() == chestType).collect(Collectors.toList());
+        final int randomIndex = new Random().nextInt(chestItemList.size());
+        return chestItemList.get(randomIndex);
     }
 
+    /**
+     * @param inventory the chest inventory
+     * @return a random available slot
+     */
     private int getRandomSlot(final Inventory inventory) {
         int randomSlot = new Random().nextInt(inventory.getSize());
         while (inventory.getItem(randomSlot) != null) { // if the slot isn't empty, continue till an empty slot is found
