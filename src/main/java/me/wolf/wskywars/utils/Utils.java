@@ -1,10 +1,24 @@
 package me.wolf.wskywars.utils;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public final class Utils {
 
@@ -57,37 +71,26 @@ public final class Utils {
         }
         player.sendMessage(sb + message);
     }
+    public static boolean pasteCage(final Location spawn , final String name) throws IOException {
+        final File schem = new File("schematics/" + name + ".schem");
+        if (schem.exists()) {
+            ClipboardFormat format = ClipboardFormats.findByFile(schem);
+            try (ClipboardReader reader = format.getReader(new FileInputStream(schem))) {
+                Clipboard clipboard = reader.read();
 
-    public static void buildCage(final Location location, int sideLength, int height) {
-        Material side = Material.GRAY_STAINED_GLASS;
-        Material topAndBottom = Material.STONE;
+                try (EditSession editSession = WorldEdit.getInstance().newEditSession(new BukkitWorld(spawn.getWorld()))) {
+                    final Operation operation = new ClipboardHolder(clipboard)
+                            .createPaste(editSession)
+                            .to(BlockVector3.at(spawn.getX(), spawn.getY(), spawn.getZ()))
+                            .ignoreAirBlocks(false)
+                            .build();
+                    Operations.complete(operation);
 
-        final int delta = (sideLength / 2);
-        final Location corner1 = new Location(location.getWorld(), location.getBlockX() + delta, location.getBlockY() + 1, location.getBlockZ() - delta);
-        final Location corner2 = new Location(location.getWorld(), location.getBlockX() - delta, location.getBlockY() + 1, location.getBlockZ() + delta);
-        final int minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
-        final int maxX = Math.max(corner1.getBlockX(), corner2.getBlockX());
-        final int minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
-        final int maxZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
-
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = 0; y < height; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    if ((x == minX || x == maxX) || (z == minZ || z == maxZ)) {
-                        Block b = corner1.getWorld().getBlockAt(x, location.getBlockY() + y, z);
-                        b.setType(side);
-                    }
-
-                    if (y == height - 1) {
-                        Block b = corner1.getWorld().getBlockAt(x, location.getBlockY() + y + 1, z);
-                        b.setType(topAndBottom);
-                    }
-                    if(y == height - 1) {
-                        Block b = corner1.getWorld().getBlockAt(x, location.getBlockY() - y + 1, z);
-                        b.setType(topAndBottom);
-                    }
+                } catch (WorldEditException e) {
+                    e.printStackTrace();
                 }
             }
-        }
+            return true;
+        } else return false;
     }
 }

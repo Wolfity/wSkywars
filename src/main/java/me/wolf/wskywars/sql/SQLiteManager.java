@@ -3,6 +3,7 @@ package me.wolf.wskywars.sql;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.wolf.wskywars.SkywarsPlugin;
+import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.player.SkywarsPlayer;
 
 import java.io.File;
@@ -84,7 +85,7 @@ public class SQLiteManager {
                 uuid,
                 getWins(uuid),
                 getKills(uuid),
-                getCoins(uuid));
+                getCoins(uuid), new Cage("defaultcage")); //TODO change this, this is default rn because I dont have multiple cages yet
 
     }
 
@@ -92,7 +93,7 @@ public class SQLiteManager {
      * @param uuid: Check if a UUID exists in the database
      * @return True if the UUID exists, false if not
      */
-    public boolean doesPlayerExist(final UUID uuid) { // checking if a specific player exisits in the database
+    public boolean doesPlayerExist(final UUID uuid) { // checking if a specific player exists in the database
         try (final Connection connection = hikari.getConnection();
              final PreparedStatement ps = connection.prepareStatement(Query.GET_PLAYERDATA)) {
             ps.setString(1, uuid.toString());

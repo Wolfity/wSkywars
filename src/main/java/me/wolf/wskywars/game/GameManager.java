@@ -6,7 +6,6 @@ import me.wolf.wskywars.arena.ArenaState;
 import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.team.Team;
-import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -116,6 +115,7 @@ public class GameManager {
                 games.add(game);
                 player.setPlayerState(PlayerState.IN_WAITING_ROOM);
             } else player.sendMessage("&cSorry, there are currently no available games to join!");
+
         } else {
             final Game game = getFreeGame(); // there is a free game
             game.getArena().getTeams().forEach(team -> {
@@ -139,9 +139,9 @@ public class GameManager {
     }
 
     public Game getGameByPlayer(final SkywarsPlayer player) {
-        for(final Game game : games) {
-            for(final Team team : game.getArena().getTeams()) {
-                if(team.getTeamMembers().contains(player)) {
+        for (final Game game : games) {
+            for (final Team team : game.getArena().getTeams()) {
+                if (team.getTeamMembers().contains(player)) {
                     return game;
                 }
             }
@@ -156,9 +156,15 @@ public class GameManager {
     private void prepareJoin(final SkywarsPlayer player, final Game game) {
         final Arena arena = game.getArena();
         // teleport to the next spawn
+
+
         for (int i = 0; i < arena.getTeams().size(); i++) {
             player.teleport(arena.getSpawnLocations().get(i));
-            Utils.buildCage(arena.getSpawnLocations().get(i), 5,3);
+            try {
+                plugin.getCageManager().pasteCage(arena.getSpawnLocations().get(i), player.getCage());
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
         }
         if (arena.getTeams().size() >= arena.getMinTeams()) {
             setGameState(game, GameState.COUNTDOWN);
@@ -195,6 +201,24 @@ public class GameManager {
                         this.cancel(); // resetting the countdown and updating the game state
                         arena.setCageCountdown(arena.getArenaConfig().getInt("cage-countdown"));
                         setGameState(game, GameState.INGAME);
+                        arena.getTeams().forEach(team -> {
+                            team.sendCenteredMessage(new String[]{
+                                    "&7---------------------------------------",
+                                    "",
+                                    "&a&lThe game has started",
+                                    "&eGood luck!",
+                                    "",
+                                    "&7---------------------------------------"
+                            });
+                            team.getTeamMembers().forEach(player -> {
+                                try {
+                                    plugin.getCageManager().removeCage(player);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                        });
+
                     }
                 }
             }

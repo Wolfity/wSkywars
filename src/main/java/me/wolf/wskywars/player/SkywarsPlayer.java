@@ -1,5 +1,6 @@
 package me.wolf.wskywars.player;
 
+import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,6 +18,7 @@ public class SkywarsPlayer {
     private int wins, kills, coins;
     private boolean isSpectator;
     private PlayerState playerState;
+    private Cage cage;
 
     // creating a first time object
     public SkywarsPlayer(final UUID uuid) {
@@ -28,13 +30,22 @@ public class SkywarsPlayer {
         this.playerState = PlayerState.IN_LOBBY;
     }
 
-    public SkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins) {
+    public SkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins, final Cage cage) {
         this.uuid = uuid;
         this.coins = coins;
         this.wins = wins;
         this.kills = kills;
         this.isSpectator = false;
         this.playerState = PlayerState.IN_LOBBY;
+        this.cage = cage;
+    }
+
+    public Cage getCage() {
+        return cage;
+    }
+
+    public void setCage(Cage cage) {
+        this.cage = cage;
     }
 
     public UUID getUuid() {

@@ -1,5 +1,7 @@
 package me.wolf.wskywars.player;
 
+import me.wolf.wskywars.cage.Cage;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -34,8 +36,8 @@ public class PlayerManager {
      * @param kills: The amount of kills stored by the UUID
      * @param coins: The amount of coins stored by the UUID
      */
-    public void loadSkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins) {
-        this.skywarsPlayers.put(uuid, new SkywarsPlayer(uuid, wins, kills, coins));
+    public void loadSkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins, final Cage cage) {
+        this.skywarsPlayers.put(uuid, new SkywarsPlayer(uuid, wins, kills, coins, cage));
     }
 
     public Map<UUID, SkywarsPlayer> getSkywarsPlayers() {

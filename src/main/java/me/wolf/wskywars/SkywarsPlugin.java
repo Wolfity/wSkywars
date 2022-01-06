@@ -2,8 +2,12 @@ package me.wolf.wskywars;
 
 
 import me.wolf.wskywars.arena.ArenaManager;
+import me.wolf.wskywars.cage.CageManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
 import me.wolf.wskywars.game.GameManager;
+import me.wolf.wskywars.listeners.BlockBreak;
+import me.wolf.wskywars.listeners.BlockPlace;
+import me.wolf.wskywars.listeners.InventoryInteractions;
 import me.wolf.wskywars.listeners.PlayerQuitJoin;
 import me.wolf.wskywars.player.PlayerManager;
 import me.wolf.wskywars.player.SkywarsPlayer;
@@ -26,11 +30,12 @@ public class SkywarsPlugin extends JavaPlugin {
     private ArenaManager arenaManager;
     private GameManager gameManager;
     private SkywarsScoreboard scoreboard;
+    private CageManager cageManager;
 
     @Override
     public void onEnable() {
         final File folder = new File(this.getDataFolder() + "/arenas");
-        final File schemFolder = new File("schematics");
+        final File schemFolder = new File("schematics/cages");
         if (!folder.exists()) folder.mkdirs();
         if (!schemFolder.exists()) schemFolder.mkdirs();
 
@@ -73,7 +78,10 @@ public class SkywarsPlugin extends JavaPlugin {
 
     private void registerListeners() {
         Arrays.asList(
-                new PlayerQuitJoin(this)
+                new PlayerQuitJoin(this),
+                new BlockBreak(this),
+                new BlockPlace(this),
+                new InventoryInteractions(this)
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 
@@ -85,6 +93,8 @@ public class SkywarsPlugin extends JavaPlugin {
         this.playerManager = new PlayerManager();
         this.gameManager = new GameManager(this);
         this.scoreboard = new SkywarsScoreboard(this);
+        this.cageManager = new CageManager();
+
     }
 
     public ArenaManager getArenaManager() {
@@ -105,5 +115,9 @@ public class SkywarsPlugin extends JavaPlugin {
 
     public SkywarsScoreboard getScoreboard() {
         return scoreboard;
+    }
+
+    public CageManager getCageManager() {
+        return cageManager;
     }
 }

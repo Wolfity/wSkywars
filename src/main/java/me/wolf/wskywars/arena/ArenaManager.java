@@ -65,7 +65,7 @@ public class ArenaManager {
                         Bukkit.getWorld(Objects.requireNonNull(cfg.getString("spawns." + spawn + ".world"))),
                         cfg.getDouble("spawns." + spawn + ".x"),
                         cfg.getDouble("spawns." + spawn + ".y"),
-                        cfg.getDouble("spawns." + spawn + "z"),
+                        cfg.getDouble("spawns." + spawn + ".z"),
                         (float) cfg.getDouble("spawns" + spawn + ".pitch"),
                         (float) cfg.getDouble("spawns." + spawn + ".yaw")
                 ));
@@ -153,7 +153,7 @@ public class ArenaManager {
                             .ignoreAirBlocks(false)
                             .build();
                     Operations.complete(operation);
-                    mid.getWorld().save();
+
                 } catch (WorldEditException e) {
                     e.printStackTrace();
                 }

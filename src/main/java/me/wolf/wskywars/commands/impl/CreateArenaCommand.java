@@ -4,6 +4,7 @@ import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.arena.Arena;
 import me.wolf.wskywars.commands.SubCommand;
 import me.wolf.wskywars.player.SkywarsPlayer;
+import org.bukkit.Bukkit;
 
 import java.io.IOException;
 
@@ -43,6 +44,8 @@ public class CreateArenaCommand extends SubCommand {
                         arena.getArenaConfig().set("center." + ".yaw", player.getYaw());
                         arena.getArenaConfig().set("center." + ".pitch", player.getPitch());
                         arena.getArenaConfig().save(arena.getArenaConfigFile());
+
+                        Bukkit.getScheduler().runTaskLater(plugin, () -> arena.getCenter().getWorld().save(), 5L);
 
                         player.sendMessage("&aSuccessfully created the arena &2" + name);
                     } else
