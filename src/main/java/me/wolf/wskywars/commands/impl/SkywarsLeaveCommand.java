@@ -25,6 +25,7 @@ public class SkywarsLeaveCommand extends SubCommand {
     protected void executeCommand(SkywarsPlayer player, String[] args, final SkywarsPlugin plugin) {
         if (plugin.getArenaManager().getArenaByPlayer(player) != null) {
             plugin.getGameManager().leaveGame(player, false);
+            plugin.getScoreboard().lobbyScoreboard(player);
         } else player.sendMessage("&cYou are not in game!");
     }
 }

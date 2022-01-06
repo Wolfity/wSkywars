@@ -23,7 +23,7 @@ public class SetHubCommand extends SubCommand {
     @Override
     protected void executeCommand(SkywarsPlayer player, String[] args, SkywarsPlugin plugin) {
         if (isAdmin(player)) {
-            if(args.length == 1) {
+            if (args.length == 1) {
                 plugin.getConfig().set("spawn.world", player.getWorld().getName());
                 plugin.getConfig().set("spawn.x", player.getX());
                 plugin.getConfig().set("spawn.y", player.getY());

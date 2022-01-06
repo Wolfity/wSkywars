@@ -45,20 +45,20 @@ public class SkywarsPlayer {
         return kills;
     }
 
-    public int getCoins() {
-        return coins;
-    }
-
-    public int getWins() {
-        return wins;
-    }
-
     public void setKills(int kills) {
         this.kills = kills;
     }
 
+    public int getCoins() {
+        return coins;
+    }
+
     public void setCoins(int coins) {
         this.coins = coins;
+    }
+
+    public int getWins() {
+        return wins;
     }
 
     public void setWins(int wins) {
@@ -138,6 +138,7 @@ public class SkywarsPlayer {
             getBukkitPlayer().removePotionEffect(effect.getType());
         }
     }
+
     public World getWorld() {
         return getLocation().getWorld();
     }

@@ -1,7 +1,6 @@
 package me.wolf.wskywars.team;
 
 import me.wolf.wskywars.player.SkywarsPlayer;
-import org.enginehub.piston.Command;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,12 +28,20 @@ public class Team implements Comparable<Team> {
     public void addMember(final SkywarsPlayer skywarsPlayer) {
         this.teamMembers.add(skywarsPlayer);
     }
+
     public void removeMember(final SkywarsPlayer skywarsPlayer) {
         this.teamMembers.remove(skywarsPlayer);
     }
 
     public Set<SkywarsPlayer> getTeamMembers() {
         return teamMembers;
+    }
+
+    public void sendMessage(final String msg) {
+        teamMembers.forEach(player -> player.sendMessage(msg));
+    }
+    public void sendCenteredMessage(final String[] msg) {
+        teamMembers.forEach(player -> player.sendCenteredMessage(msg));
     }
 
     @Override

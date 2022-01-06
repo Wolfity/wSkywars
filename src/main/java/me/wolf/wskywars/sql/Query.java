@@ -15,7 +15,9 @@ public final class Query {
     public static final String SET_WINS = "UPDATE players SET wins = ? WHERE uuid = ?";
     public static final String SET_KILLS = "UPDATE players SET kills = ? WHERE uuid = ?";
     public static final String SET_COINS = "UPDATE players SET coins = ? WHERE uuid = ?";
-    public static final String GET_PLAYERDATA ="SELECT * FROM players WHERE uuid = ?";
-    private Query() {}
+    public static final String GET_PLAYERDATA = "SELECT * FROM players WHERE uuid = ?";
+
+    private Query() {
+    }
 
 }

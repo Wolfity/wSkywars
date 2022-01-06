@@ -31,12 +31,11 @@ import java.util.Set;
 public class ArenaManager {
 
     private final SkywarsPlugin plugin;
+    private final Set<Arena> arenas = new HashSet<>();
 
     public ArenaManager(final SkywarsPlugin plugin) {
         this.plugin = plugin;
     }
-
-    private final Set<Arena> arenas = new HashSet<>();
 
     public Arena createArena(final String arenaName) {
 

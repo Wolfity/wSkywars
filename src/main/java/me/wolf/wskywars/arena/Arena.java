@@ -14,12 +14,12 @@ import java.util.*;
 public class Arena {
 
     private final String name;
-    private int teamSize, cageCountdown, chestRefill, gameTimer, minTeams, maxTeams;
     private final Set<Team> teams;
-    private FileConfiguration arenaConfig;
-    private File arenaConfigFile;
     private final List<Location> spawnLocations;
     private final Set<Location> openedChests;
+    private int teamSize, cageCountdown, chestRefill, gameTimer, minTeams, maxTeams;
+    private FileConfiguration arenaConfig;
+    private File arenaConfigFile;
     private ArenaState arenaState;
     private Location center;
 
@@ -41,36 +41,20 @@ public class Arena {
         return maxTeams;
     }
 
-    public int getMinTeams() {
-        return minTeams;
-    }
-
     public void setMaxTeams(int maxTeams) {
         this.maxTeams = maxTeams;
+    }
+
+    public int getMinTeams() {
+        return minTeams;
     }
 
     public void setMinTeams(int minTeams) {
         this.minTeams = minTeams;
     }
 
-    public void setGameTimer(int gameTimer) {
-        this.gameTimer = gameTimer;
-    }
-
     public void addTeam(final Team team) {
         this.teams.add(team);
-    }
-
-    public void setCageCountdown(int cageCountdown) {
-        this.cageCountdown = cageCountdown;
-    }
-
-    public void setChestRefill(int chestRefill) {
-        this.chestRefill = chestRefill;
-    }
-
-    public void setTeamSize(int teamSize) {
-        this.teamSize = teamSize;
     }
 
     public Set<Team> getTeams() {
@@ -85,12 +69,24 @@ public class Arena {
         return gameTimer;
     }
 
+    public void setGameTimer(int gameTimer) {
+        this.gameTimer = gameTimer;
+    }
+
     public int getCageCountdown() {
         return cageCountdown;
     }
 
+    public void setCageCountdown(int cageCountdown) {
+        this.cageCountdown = cageCountdown;
+    }
+
     public int getChestRefill() {
         return chestRefill;
+    }
+
+    public void setChestRefill(int chestRefill) {
+        this.chestRefill = chestRefill;
     }
 
     public File getArenaConfigFile() {
@@ -105,6 +101,10 @@ public class Arena {
         return teamSize;
     }
 
+    public void setTeamSize(int teamSize) {
+        this.teamSize = teamSize;
+    }
+
     public List<Location> getSpawnLocations() {
         return spawnLocations;
     }
@@ -116,16 +116,17 @@ public class Arena {
     public void addSpawnLocation(final Location location) {
         this.spawnLocations.add(location);
     }
+
     public void addOpenedChest(final Location location) {
         this.openedChests.add(location);
     }
 
-    public void setCenter(Location center) {
-        this.center = center;
-    }
-
     public Location getCenter() {
         return center;
+    }
+
+    public void setCenter(Location center) {
+        this.center = center;
     }
 
     public ArenaState getArenaState() {
@@ -139,9 +140,11 @@ public class Arena {
     public void decrementCageCountDown() {
         this.cageCountdown--;
     }
+
     public void decrementChestRefill() {
         this.chestRefill--;
     }
+
     public void decrementGameTimer() {
         this.gameTimer--;
     }

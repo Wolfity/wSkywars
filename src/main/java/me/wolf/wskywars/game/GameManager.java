@@ -6,6 +6,7 @@ import me.wolf.wskywars.arena.ArenaState;
 import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.team.Team;
+import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -13,19 +14,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class GameManager {
 
     private final SkywarsPlugin plugin;
+    private final Set<Game> games = new HashSet<>();
 
     public GameManager(final SkywarsPlugin plugin) {
         this.plugin = plugin;
     }
-
-    private final Set<Game> games = new HashSet<>();
 
     public void setGameState(final Game game, final GameState gameState) {
         game.setGameState(gameState);
@@ -74,7 +72,7 @@ public class GameManager {
         player.clearEffects();
         player.resetHunger();
 
-        player.teleport( // teleport to the quake spawn
+        player.teleport( // teleport to the skywars spawn
                 new Location(Bukkit.getWorld(Objects.requireNonNull(plugin.getConfig().getString("spawn.world"))),
                         plugin.getConfig().getDouble("spawn.x"),
                         plugin.getConfig().getDouble("spawn.y"),
@@ -104,32 +102,51 @@ public class GameManager {
             final Arena freeArena = plugin.getArenaManager().getFreeArena();
             if (freeArena != null) { // there are available arenas, create a new game with that free arena
                 final Game game = new Game(freeArena);
-                final Team availableTeam = game.getArena().getTeams().stream().filter(team -> team.getTeamMembers().size() < team.getSize()).findFirst().orElse(null);
+                Team availableTeam = game.getArena().getTeams().stream().filter(team -> team.getTeamMembers().size() < team.getSize()).findFirst().orElse(null);
                 if (availableTeam != null) {
                     availableTeam.addMember(player);
-                    player.sendMessage("&aSuccessfully joined team &2" + availableTeam.getName());
                 } else { // there is no available team
-                    final Team team = new Team(getTeamName(freeArena), freeArena.getTeamSize());
-                    team.addMember(player);
-                    freeArena.addTeam(team);
-                    player.sendMessage("&aSuccessfully joined team &2" + team.getName());
+                    availableTeam = new Team(getTeamName(freeArena), freeArena.getTeamSize());
+                    availableTeam.addMember(player);
+                    freeArena.addTeam(availableTeam);
+                    System.out.println("NOPE ");
                 }
                 prepareJoin(player, game);
+                player.sendMessage("&aSuccessfully joined team &2" + availableTeam.getName());
                 games.add(game);
+                player.setPlayerState(PlayerState.IN_WAITING_ROOM);
             } else player.sendMessage("&cSorry, there are currently no available games to join!");
         } else {
             final Game game = getFreeGame(); // there is a free game
             game.getArena().getTeams().forEach(team -> {
+                System.out.println("in lambda");
                 if (team.getTeamMembers().size() < team.getSize()) { // check if there are any teams with a free spot
                     team.getTeamMembers().add(player);
                     player.sendMessage("&aSuccessfully joined team &2" + team.getName());
-                    prepareJoin(player, game);
+                    System.out.println("Team with free spot?");
                 } else {
-                   
+                    final Team newTeam = new Team(getTeamName(game.getArena()), game.getArena().getTeamSize());
+                    newTeam.addMember(player);
+                    game.getArena().addTeam(newTeam);
+                    player.sendMessage("&aSuccessfully joined team &2" + newTeam.getName());
+                    System.out.println("new team added ");
                 }
             });
+            prepareJoin(player, game);
             games.add(game);
+            player.setPlayerState(PlayerState.IN_WAITING_ROOM);
         }
+    }
+
+    public Game getGameByPlayer(final SkywarsPlayer player) {
+        for(final Game game : games) {
+            for(final Team team : game.getArena().getTeams()) {
+                if(team.getTeamMembers().contains(player)) {
+                    return game;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -141,18 +158,20 @@ public class GameManager {
         // teleport to the next spawn
         for (int i = 0; i < arena.getTeams().size(); i++) {
             player.teleport(arena.getSpawnLocations().get(i));
+            Utils.buildCage(arena.getSpawnLocations().get(i), 5,3);
         }
         if (arena.getTeams().size() >= arena.getMinTeams()) {
             setGameState(game, GameState.COUNTDOWN);
         }
-
+        System.out.println("TEAMS " + game.getArena().getTeams().size());
     }
+
     private void startGameTimer(final Game game) {
         final Arena arena = game.getArena();
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(arena.getGameTimer() > 0) {
+                if (arena.getGameTimer() > 0) {
                     arena.decrementGameTimer();
                 } else {
                     this.cancel();
@@ -171,6 +190,7 @@ public class GameManager {
                 if (game.getGameState() == GameState.COUNTDOWN) {
                     if (arena.getCageCountdown() > 0) {
                         arena.decrementCageCountDown();
+                        arena.getTeams().forEach(team -> team.sendMessage("&eThe game will start in " + arena.getCageCountdown()));
                     } else {
                         this.cancel(); // resetting the countdown and updating the game state
                         arena.setCageCountdown(arena.getArenaConfig().getInt("cage-countdown"));
@@ -186,7 +206,7 @@ public class GameManager {
         arena.setArenaState(ArenaState.RECRUITING);
 
         arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> {
-            skywarsPlayer.sendCenteredMessage(new String[] {
+            skywarsPlayer.sendCenteredMessage(new String[]{
                     "&7---------------------------------",
                     "",
                     "&e&lThe Game Has Ended!",
@@ -233,15 +253,16 @@ public class GameManager {
     }
 
     private Team getWinners(final Arena arena) {
-        for(final Team team : arena.getTeams()) {
-            for(final SkywarsPlayer player : team.getTeamMembers()) {
-                if(!player.isSpectator()) {
+        for (final Team team : arena.getTeams()) {
+            for (final SkywarsPlayer player : team.getTeamMembers()) {
+                if (!player.isSpectator()) {
                     return team;
                 }
             }
         }
         return null;
     }
+
     private String formatWinners(final Team winningTeam) {
         final StringBuilder sb = new StringBuilder();
         winningTeam.getTeamMembers().forEach(skywarsPlayer -> sb.append(skywarsPlayer.getName()).append(" - ").append(skywarsPlayer.getKills()).append("\n"));

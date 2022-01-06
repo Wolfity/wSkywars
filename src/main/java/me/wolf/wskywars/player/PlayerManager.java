@@ -29,8 +29,8 @@ public class PlayerManager {
     }
 
     /**
-     * @param uuid: The UUID of the player we are going to load in
-     * @param wins: The amount of wins stored by the UUID
+     * @param uuid:  The UUID of the player we are going to load in
+     * @param wins:  The amount of wins stored by the UUID
      * @param kills: The amount of kills stored by the UUID
      * @param coins: The amount of coins stored by the UUID
      */

@@ -6,6 +6,7 @@ public class Game {
 
     private final Arena arena;
     private GameState gameState;
+
     public Game(final Arena arena) {
         this.arena = arena;
         this.gameState = GameState.READY;

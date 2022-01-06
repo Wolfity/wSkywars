@@ -1,25 +1,10 @@
 package me.wolf.wskywars.commands.impl;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.ClipboardHolder;
 import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.arena.Arena;
 import me.wolf.wskywars.commands.SubCommand;
 import me.wolf.wskywars.player.SkywarsPlayer;
-import org.bukkit.Location;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 public class CreateArenaCommand extends SubCommand {

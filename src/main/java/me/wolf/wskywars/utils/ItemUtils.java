@@ -6,6 +6,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public final class ItemUtils {
 
+    private ItemUtils() {
+    }
+
     public static ItemStack createItem(final Material mat, final String display, final int amount) {
         final ItemStack is = new ItemStack(mat, amount);
         final ItemMeta meta = is.getItemMeta();
@@ -66,8 +69,5 @@ public final class ItemUtils {
     public static boolean isBoots(final Material material) {
         return material.name().contains("_BOOTS");
     }
-
-
-    private ItemUtils() {}
 
 }
