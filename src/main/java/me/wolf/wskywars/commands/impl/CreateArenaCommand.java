@@ -13,6 +13,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import me.wolf.wskywars.SkywarsPlugin;
+import me.wolf.wskywars.arena.Arena;
 import me.wolf.wskywars.commands.SubCommand;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.Location;
@@ -46,11 +47,21 @@ public class CreateArenaCommand extends SubCommand {
             if (plugin.getArenaManager().getArenaByName(name) == null) {
                 player.sendMessage("&aTrying to create the arena &2" + name + "...");
                 try {
-                    if (pasteMap(player.getLocation(), name)) {
-                        plugin.getArenaManager().createArena(name);
+                    if (plugin.getArenaManager().pasteMap(player.getLocation(), name)) {
+                        final Arena arena = plugin.getArenaManager().createArena(name);
+                        arena.setCenter(player.getLocation());
+
+                        arena.getArenaConfig().set("center." + ".world", player.getWorld().getName());
+                        arena.getArenaConfig().set("center." + ".x", player.getX());
+                        arena.getArenaConfig().set("center." + ".y", player.getY());
+                        arena.getArenaConfig().set("center." + ".z", player.getZ());
+                        arena.getArenaConfig().set("center." + ".yaw", player.getYaw());
+                        arena.getArenaConfig().set("center." + ".pitch", player.getPitch());
+                        arena.getArenaConfig().save(arena.getArenaConfigFile());
+
                         player.sendMessage("&aSuccessfully created the arena &2" + name);
                     } else
-                        player.sendMessage("&cSomething went wrong! Make sure that the schematic is in the folder <schematics> ");
+                        player.sendMessage("&cSomething went wrong! Make sure that the schematic is in the folder <schematics> and has the exact name as the arena!");
                 } catch (final IOException e) {
                     e.printStackTrace();
                 }
@@ -58,26 +69,4 @@ public class CreateArenaCommand extends SubCommand {
         }
     }
 
-    private boolean pasteMap(final Location mid, final String name) throws IOException {
-        final File schem = new File("schematics/" + name + ".schem");
-        if (schem.exists()) {
-            ClipboardFormat format = ClipboardFormats.findByFile(schem);
-            try (ClipboardReader reader = format.getReader(new FileInputStream(schem))) {
-                Clipboard clipboard = reader.read();
-
-                try (EditSession editSession = WorldEdit.getInstance().newEditSession(new BukkitWorld(mid.getWorld()))) {
-                    final Operation operation = new ClipboardHolder(clipboard)
-                            .createPaste(editSession)
-                            .to(BlockVector3.at(mid.getX(), mid.getY(), mid.getZ()))
-                            .ignoreAirBlocks(false)
-                            .build();
-                    Operations.complete(operation);
-
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
-                }
-            }
-            return true;
-        } else return false;
-    }
 }

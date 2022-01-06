@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class SkywarsPlayer {
@@ -102,6 +103,7 @@ public class SkywarsPlayer {
         }
     }
 
+
     public Location getLocation() {
         return getBukkitPlayer().getLocation();
     }
@@ -115,11 +117,16 @@ public class SkywarsPlayer {
         getBukkitPlayer().setSaturation(20);
     }
 
-    public void clearArmor() {
+    public void clearInventory() {
+        getInventory().clear();
         getInventory().setHelmet(null);
         getInventory().setChestplate(null);
         getInventory().setLeggings(null);
         getInventory().setBoots(null);
+    }
+
+    public void resetHunger() {
+        getBukkitPlayer().setFoodLevel(20);
     }
 
     public void teleport(final Location location) {
@@ -155,5 +162,17 @@ public class SkywarsPlayer {
         return getLocation().getPitch();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SkywarsPlayer that = (SkywarsPlayer) o;
+        return uuid.equals(that.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid);
+    }
 }
 

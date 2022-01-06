@@ -1,11 +1,12 @@
 package me.wolf.wskywars.team;
 
 import me.wolf.wskywars.player.SkywarsPlayer;
+import org.enginehub.piston.Command;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Team {
+public class Team implements Comparable<Team> {
 
     private final char name;
     private final int size;
@@ -25,7 +26,19 @@ public class Team {
         return name;
     }
 
+    public void addMember(final SkywarsPlayer skywarsPlayer) {
+        this.teamMembers.add(skywarsPlayer);
+    }
+    public void removeMember(final SkywarsPlayer skywarsPlayer) {
+        this.teamMembers.remove(skywarsPlayer);
+    }
+
     public Set<SkywarsPlayer> getTeamMembers() {
         return teamMembers;
+    }
+
+    @Override
+    public int compareTo(Team o) {
+        return Character.compare(name, o.getName());
     }
 }

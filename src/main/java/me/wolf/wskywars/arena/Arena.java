@@ -9,47 +9,56 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Arena {
 
     private final String name;
-    private int teamSize, cageCountdown, chestRefill, gameTimer, minPlayers, maxPlayers;
-    private Set<Team> teams;
+    private int teamSize, cageCountdown, chestRefill, gameTimer, minTeams, maxTeams;
+    private final Set<Team> teams;
     private FileConfiguration arenaConfig;
     private File arenaConfigFile;
     private final List<Location> spawnLocations;
     private final Set<Location> openedChests;
+    private ArenaState arenaState;
+    private Location center;
 
-    public Arena(final String name, final int gameTimer, final int chestRefill, final int cageCountdown, final int minPlayers, final int maxPlayers, final int teamSize) {
+    public Arena(final String name, final int gameTimer, final int chestRefill, final int cageCountdown, final int minTeams, final int maxTeams, final int teamSize) {
         this.name = name;
         this.gameTimer = gameTimer;
         this.chestRefill = chestRefill;
         this.cageCountdown = cageCountdown;
-        this.minPlayers = minPlayers;
-        this.maxPlayers = maxPlayers;
+        this.maxTeams = maxTeams;
+        this.minTeams = minTeams;
         this.teamSize = teamSize;
         this.spawnLocations = new ArrayList<>();
         this.openedChests = new HashSet<>();
+        this.arenaState = ArenaState.RECRUITING;
+        this.teams = new HashSet<>();
     }
 
-    public void setMaxPlayers(int maxPlayers) {
-        this.maxPlayers = maxPlayers;
+    public int getMaxTeams() {
+        return maxTeams;
     }
 
-    public void setMinPlayers(int minPlayers) {
-        this.minPlayers = minPlayers;
+    public int getMinTeams() {
+        return minTeams;
+    }
+
+    public void setMaxTeams(int maxTeams) {
+        this.maxTeams = maxTeams;
+    }
+
+    public void setMinTeams(int minTeams) {
+        this.minTeams = minTeams;
     }
 
     public void setGameTimer(int gameTimer) {
         this.gameTimer = gameTimer;
     }
 
-    public void setTeams(Set<Team> teams) {
-        this.teams = teams;
+    public void addTeam(final Team team) {
+        this.teams.add(team);
     }
 
     public void setCageCountdown(int cageCountdown) {
@@ -66,14 +75,6 @@ public class Arena {
 
     public Set<Team> getTeams() {
         return teams;
-    }
-
-    public int getMaxPlayers() {
-        return maxPlayers;
-    }
-
-    public int getMinPlayers() {
-        return minPlayers;
     }
 
     public String getName() {
@@ -119,6 +120,32 @@ public class Arena {
         this.openedChests.add(location);
     }
 
+    public void setCenter(Location center) {
+        this.center = center;
+    }
+
+    public Location getCenter() {
+        return center;
+    }
+
+    public ArenaState getArenaState() {
+        return arenaState;
+    }
+
+    public void setArenaState(ArenaState arenaState) {
+        this.arenaState = arenaState;
+    }
+
+    public void decrementCageCountDown() {
+        this.cageCountdown--;
+    }
+    public void decrementChestRefill() {
+        this.chestRefill--;
+    }
+    public void decrementGameTimer() {
+        this.gameTimer--;
+    }
+
     /**
      * @param plugin instance of the main class
      * @param arena  the arena we are creating a config for, so every arena can have different settings
@@ -137,8 +164,8 @@ public class Arena {
             try {
                 arenaConfigFile.createNewFile();
                 arenaConfig.load(arenaConfigFile);
-                arenaConfig.set("min-players", arena.getMinPlayers());
-                arenaConfig.set("max-players", arena.getMaxPlayers());
+                arenaConfig.set("min-teams", arena.getMinTeams());
+                arenaConfig.set("max-teams", arena.getMaxTeams());
                 arenaConfig.set("cage-countdown", arena.getCageCountdown());
                 arenaConfig.set("game-timer", arena.getGameTimer());
                 arenaConfig.set("chest-refill", arena.getChestRefill());
@@ -150,4 +177,16 @@ public class Arena {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Arena arena = (Arena) o;
+        return name.equals(arena.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 }

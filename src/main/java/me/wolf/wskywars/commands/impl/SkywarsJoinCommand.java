@@ -24,11 +24,8 @@ public class SkywarsJoinCommand extends SubCommand {
 
     @Override
     protected void executeCommand(SkywarsPlayer player, String[] args, SkywarsPlugin plugin) {
-        if (args.length > 0) {
-            player.sendMessage(getUsage());
-        } else {
-            //  join game
-            player.sendMessage("&aSuccessfully joined a game");
-        }
+        if (plugin.getArenaManager().getArenaByPlayer(player) == null) {
+            plugin.getGameManager().joinGame(player);
+        } else player.sendMessage("&cYou are already in game!");
     }
 }

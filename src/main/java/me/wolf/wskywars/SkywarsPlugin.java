@@ -3,6 +3,7 @@ package me.wolf.wskywars;
 
 import me.wolf.wskywars.arena.ArenaManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
+import me.wolf.wskywars.game.GameManager;
 import me.wolf.wskywars.listeners.PlayerQuitJoin;
 import me.wolf.wskywars.player.PlayerManager;
 import me.wolf.wskywars.player.SkywarsPlayer;
@@ -22,6 +23,7 @@ public class SkywarsPlugin extends JavaPlugin {
     private PlayerManager playerManager;
     private SQLiteManager sqLiteManager;
     private ArenaManager arenaManager;
+    private GameManager gameManager;
 
     @Override
     public void onEnable() {
@@ -79,7 +81,7 @@ public class SkywarsPlugin extends JavaPlugin {
         this.arenaManager = new ArenaManager(this);
         arenaManager.loadArenas();
         this.playerManager = new PlayerManager();
-
+        this.gameManager = new GameManager(this);
 
     }
 
@@ -93,5 +95,9 @@ public class SkywarsPlugin extends JavaPlugin {
 
     public SQLiteManager getSqLiteManager() {
         return sqLiteManager;
+    }
+
+    public GameManager getGameManager() {
+        return gameManager;
     }
 }

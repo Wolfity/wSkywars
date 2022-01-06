@@ -15,15 +15,12 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.team.Team;
+import me.wolf.wskywars.world.EmptyChunkGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.enginehub.piston.util.NonnullByDefault;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -62,19 +59,30 @@ public class ArenaManager {
             final Arena arena = createArena(file.getName().replace(".yml", ""));
             final FileConfiguration cfg = arena.getArenaConfig();
 
+            new WorldCreator(Objects.requireNonNull(cfg.getString("center.world"))).generator(new EmptyChunkGenerator()).createWorld();
+
             for (final String spawn : cfg.getConfigurationSection("spawns").getKeys(false)) {
                 arena.addSpawnLocation(new Location(
                         Bukkit.getWorld(Objects.requireNonNull(cfg.getString("spawns." + spawn + ".world"))),
                         cfg.getDouble("spawns." + spawn + ".x"),
                         cfg.getDouble("spawns." + spawn + ".y"),
                         cfg.getDouble("spawns." + spawn + "z"),
-                        (float) cfg.getDouble("spawns.pitch"),
-                        (float) cfg.getDouble("spawns.yaw")
+                        (float) cfg.getDouble("spawns" + spawn + ".pitch"),
+                        (float) cfg.getDouble("spawns." + spawn + ".yaw")
                 ));
             }
 
-            final int minPlayers = cfg.getInt("min-players");
-            final int maxPlayers = cfg.getInt("max-players");
+            final Location center = new Location(
+                    Bukkit.getWorld(Objects.requireNonNull(cfg.getString("center.world"))),
+                    cfg.getDouble("center.x"),
+                    cfg.getDouble("center.y"),
+                    cfg.getDouble("center.z"),
+                    (float) cfg.getDouble("center.pitch"),
+                    (float) cfg.getDouble("center.yaw"));
+
+            arena.setCenter(center);
+            final int minTeams = cfg.getInt("min-teams");
+            final int maxTeams = cfg.getInt("max-teams");
             final int cageCountdown = cfg.getInt("cage-countdown");
             final int chestRefill = cfg.getInt("chest-refill");
             final int teamSize = cfg.getInt("team-size");
@@ -86,11 +94,18 @@ public class ArenaManager {
             arena.setChestRefill(chestRefill);
             arena.setCageCountdown(cageCountdown);
             arena.setTeamSize(teamSize);
-            arena.setMinPlayers(minPlayers);
-            arena.setMaxPlayers(maxPlayers);
-
+            arena.setMinTeams(minTeams);
+            arena.setMaxTeams(maxTeams);
 
         }
+    }
+
+    /**
+     * @return a free arena
+     * @throws NullPointerException if there are no free arenas
+     */
+    public Arena getFreeArena() {
+        return arenas.stream().filter(arena -> arena.getArenaState() == ArenaState.RECRUITING || arena.getArenaState() == ArenaState.IN_COUNTDOWN).findFirst().orElse(null);
     }
 
     /**
@@ -123,6 +138,29 @@ public class ArenaManager {
         final Arena arena = getArenaByName(arenaName);
         arena.getArenaConfigFile().delete();
         arenas.remove(arena);
+    }
+
+    public boolean pasteMap(final Location mid, final String name) throws IOException {
+        final File schem = new File("schematics/" + name + ".schem");
+        if (schem.exists()) {
+            ClipboardFormat format = ClipboardFormats.findByFile(schem);
+            try (ClipboardReader reader = format.getReader(new FileInputStream(schem))) {
+                Clipboard clipboard = reader.read();
+
+                try (EditSession editSession = WorldEdit.getInstance().newEditSession(new BukkitWorld(mid.getWorld()))) {
+                    final Operation operation = new ClipboardHolder(clipboard)
+                            .createPaste(editSession)
+                            .to(BlockVector3.at(mid.getX(), mid.getY(), mid.getZ()))
+                            .ignoreAirBlocks(false)
+                            .build();
+                    Operations.complete(operation);
+                    mid.getWorld().save();
+                } catch (WorldEditException e) {
+                    e.printStackTrace();
+                }
+            }
+            return true;
+        } else return false;
     }
 
 }
