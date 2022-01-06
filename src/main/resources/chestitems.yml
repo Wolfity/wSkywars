@@ -1,0 +1,91 @@
+chest-items:
+  '1':
+    type: ISLAND
+    material: DIAMOND_SWORD
+    name: "&bDia Sword"
+    amount: 1
+  '2':
+    type: ISLAND
+    material: COOKED_BEEF
+    name: "&cRare Steak"
+    amount: 8
+  '3':
+    type: ISLAND
+    material: LEATHER_CHESTPLATE
+    name: Leather ChestPlate
+    amount: 1
+  '4':
+    type: ISLAND
+    material: CHAINMAIL_BOOTS
+    name: "Chain Boots"
+    amount: 1
+  '5':
+    type: ISLAND
+    material: IRON_LEGGINGS
+    name: "Iron Leggings"
+    amount: 1
+  '6':
+    type: ISLAND
+    material: GOLDEN_HELMET
+    name: "Golden Helmet"
+    amount: 1
+  '7':
+    type: ISLAND
+    material: IRON_SWORD
+    name: "&cIron Stick"
+    amount: 1
+  '8':
+    type: ISLAND
+    material: COBBLESTONE
+    name: ""
+    amount: 16
+  '9':
+    type: ISLAND
+    material: OAK_PLANKS
+    name: ""
+    amount: 32
+  '10':
+    type: ISLAND
+    material: FISHING_ROD
+    name: "&aRod"
+    amount: 1
+  '11':
+    type: MID
+    material: DIAMOND_BOOTS
+    name: "&bTanky Boots"
+    amount: 1
+  '12':
+    type: MID
+    material: DIAMOND_LEGGINGS
+    name: "&bTanky Leggings"
+    amount: 1
+  '13':
+    type: MID
+    material: "DIAMOND_CHESTPLATE"
+    name: "&bTanky ChestPlate"
+    amount: 1
+  '14':
+    type: MID
+    material: "DIAMOND_HELMET"
+    name: "&bTanky Helmet"
+    amount: 1
+  '15':
+    type: MID
+    material: ENDER_PEARL
+    name: ""
+    amount: 2
+  '16':
+    type: MID
+    material: GOLDEN_APPLE
+    name: ""
+    amount: 2
+  '17':
+    type: ISLAND
+    material: IRON_PICKAXE
+    name: ""
+    amount: 1
+  '18':
+    type: ISLAND
+    material: STONE_AXE
+    name: ""
+    amount: 1

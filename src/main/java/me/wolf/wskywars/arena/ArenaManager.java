@@ -13,8 +13,11 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import me.wolf.wskywars.SkywarsPlugin;
+import me.wolf.wskywars.chest.ChestType;
+import me.wolf.wskywars.chest.SkywarsChest;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.team.Team;
+import me.wolf.wskywars.utils.Utils;
 import me.wolf.wskywars.world.EmptyChunkGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,9 +27,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class ArenaManager {
 
@@ -60,15 +61,20 @@ public class ArenaManager {
 
             new WorldCreator(Objects.requireNonNull(cfg.getString("center.world"))).generator(new EmptyChunkGenerator()).createWorld();
 
+            final List<Location> spawns = new ArrayList<>();
+            final Set<SkywarsChest> chests = new HashSet<>();
+
             for (final String spawn : cfg.getConfigurationSection("spawns").getKeys(false)) {
-                arena.addSpawnLocation(new Location(
-                        Bukkit.getWorld(Objects.requireNonNull(cfg.getString("spawns." + spawn + ".world"))),
-                        cfg.getDouble("spawns." + spawn + ".x"),
-                        cfg.getDouble("spawns." + spawn + ".y"),
-                        cfg.getDouble("spawns." + spawn + ".z"),
-                        (float) cfg.getDouble("spawns" + spawn + ".pitch"),
-                        (float) cfg.getDouble("spawns." + spawn + ".yaw")
-                ));
+                spawns.add(Utils.stringToLoc(Objects.requireNonNull(cfg.getString("spawns." + spawn))));
+            }
+
+            for (final String chest : cfg.getConfigurationSection("chests").getKeys(false)) {
+
+                final SkywarsChest skywarsChest = new SkywarsChest(
+                        Utils.stringToLoc(Objects.requireNonNull(cfg.getString("chests." + chest + ".location"))),
+                        ChestType.valueOf(cfg.getString("chests." + chest + ".type")),
+                        cfg.getInt("chests." + chest + ".items"));
+                chests.add(skywarsChest);
             }
 
             final Location center = new Location(
@@ -79,6 +85,8 @@ public class ArenaManager {
                     (float) cfg.getDouble("center.pitch"),
                     (float) cfg.getDouble("center.yaw"));
 
+            System.out.println("chests " + chests.size());
+            System.out.println("spawns " + spawns.size());
             arena.setCenter(center);
             final int minTeams = cfg.getInt("min-teams");
             final int maxTeams = cfg.getInt("max-teams");
@@ -89,6 +97,8 @@ public class ArenaManager {
 
             Bukkit.getLogger().info("&aLoaded arena &e" + arena.getName());
 
+            arena.setChests(chests);
+            arena.setSpawnLocations(spawns);
             arena.setGameTimer(gameTimer);
             arena.setChestRefill(chestRefill);
             arena.setCageCountdown(cageCountdown);

@@ -1,6 +1,7 @@
 package me.wolf.wskywars.arena;
 
 import me.wolf.wskywars.SkywarsPlugin;
+import me.wolf.wskywars.chest.SkywarsChest;
 import me.wolf.wskywars.team.Team;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -15,8 +16,8 @@ public class Arena {
 
     private final String name;
     private final Set<Team> teams;
-    private final List<Location> spawnLocations;
-    private final Set<Location> openedChests;
+    private  List<Location> spawnLocations;
+    private  Set<SkywarsChest> chests ;
     private int teamSize, cageCountdown, chestRefill, gameTimer, minTeams, maxTeams;
     private FileConfiguration arenaConfig;
     private File arenaConfigFile;
@@ -32,7 +33,7 @@ public class Arena {
         this.minTeams = minTeams;
         this.teamSize = teamSize;
         this.spawnLocations = new ArrayList<>();
-        this.openedChests = new HashSet<>();
+        this.chests = new HashSet<>();
         this.arenaState = ArenaState.RECRUITING;
         this.teams = new HashSet<>();
     }
@@ -85,6 +86,10 @@ public class Arena {
         return chestRefill;
     }
 
+    public void setSpawnLocations(List<Location> spawnLocations) {
+        this.spawnLocations = spawnLocations;
+    }
+
     public void setChestRefill(int chestRefill) {
         this.chestRefill = chestRefill;
     }
@@ -109,17 +114,15 @@ public class Arena {
         return spawnLocations;
     }
 
-    public Set<Location> getOpenedChests() {
-        return openedChests;
+    public Set<SkywarsChest> getChests() {
+        return chests;
     }
 
     public void addSpawnLocation(final Location location) {
         this.spawnLocations.add(location);
     }
 
-    public void addOpenedChest(final Location location) {
-        this.openedChests.add(location);
-    }
+
 
     public Location getCenter() {
         return center;
@@ -147,6 +150,10 @@ public class Arena {
 
     public void decrementGameTimer() {
         this.gameTimer--;
+    }
+
+    public void setChests(Set<SkywarsChest> chests) {
+        this.chests = chests;
     }
 
     /**

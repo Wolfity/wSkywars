@@ -4,6 +4,7 @@ import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.arena.Arena;
 import me.wolf.wskywars.commands.SubCommand;
 import me.wolf.wskywars.player.SkywarsPlayer;
+import me.wolf.wskywars.utils.Utils;
 
 import java.io.IOException;
 
@@ -32,12 +33,7 @@ public class AddArenaSpawnCommand extends SubCommand {
             if (plugin.getArenaManager().getArenaByName(args[1]) != null) { // check if the arena exists
                 final Arena arena = plugin.getArenaManager().getArenaByName(args[1]);
                 // set the spawn to the config
-                arena.getArenaConfig().set("spawns." + arena.getSpawnLocations().size() + ".world", player.getWorld().getName());
-                arena.getArenaConfig().set("spawns." + arena.getSpawnLocations().size() + ".x", player.getX());
-                arena.getArenaConfig().set("spawns." + arena.getSpawnLocations().size() + ".y", player.getY());
-                arena.getArenaConfig().set("spawns." + arena.getSpawnLocations().size() + ".z", player.getZ());
-                arena.getArenaConfig().set("spawns." + arena.getSpawnLocations().size() + ".yaw", player.getYaw());
-                arena.getArenaConfig().set("spawns." + arena.getSpawnLocations().size() + ".pitch", player.getPitch());
+                arena.getArenaConfig().set("spawns." + arena.getSpawnLocations().size(), Utils.locToString(player.getLocation()));
 
                 try { // saving the file
                     arena.getArenaConfig().save(arena.getArenaConfigFile());
@@ -51,4 +47,5 @@ public class AddArenaSpawnCommand extends SubCommand {
 
         }
     }
+
 }

@@ -1,24 +1,9 @@
 package me.wolf.wskywars.utils;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.session.ClipboardHolder;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 public final class Utils {
 
@@ -71,26 +56,15 @@ public final class Utils {
         }
         player.sendMessage(sb + message);
     }
-    public static boolean pasteCage(final Location spawn , final String name) throws IOException {
-        final File schem = new File("schematics/" + name + ".schem");
-        if (schem.exists()) {
-            ClipboardFormat format = ClipboardFormats.findByFile(schem);
-            try (ClipboardReader reader = format.getReader(new FileInputStream(schem))) {
-                Clipboard clipboard = reader.read();
 
-                try (EditSession editSession = WorldEdit.getInstance().newEditSession(new BukkitWorld(spawn.getWorld()))) {
-                    final Operation operation = new ClipboardHolder(clipboard)
-                            .createPaste(editSession)
-                            .to(BlockVector3.at(spawn.getX(), spawn.getY(), spawn.getZ()))
-                            .ignoreAirBlocks(false)
-                            .build();
-                    Operations.complete(operation);
+    public static String locToString(final Location location) {
+        return location.getWorld().getName() + " " + location.getX() + " " + location.getY() + " " + location.getZ() +
+                " " + location.getYaw() + " " + location.getPitch();
+    }
 
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
-                }
-            }
-            return true;
-        } else return false;
+    public static Location stringToLoc(final String s) {
+        final String[] splitLoc = s.split(" ");
+
+        return new Location(Bukkit.getWorld(splitLoc[0]), Double.parseDouble(splitLoc[1]), Double.parseDouble(splitLoc[2]), (Double.parseDouble(splitLoc[3])));
     }
 }

@@ -1,0 +1,40 @@
+package me.wolf.wskywars.chest;
+
+import org.bukkit.Location;
+
+public class SkywarsChest {
+
+    private Location location;
+    private ChestType chestType;
+    private int itemsPerChest;
+
+    public SkywarsChest(final Location location, final ChestType chestType, final int itemsPerChest) {
+        this.location = location;
+        this.chestType = chestType;
+        this.itemsPerChest = itemsPerChest;
+    }
+
+    public void setItemsPerChest(int itemsPerChest) {
+        this.itemsPerChest = itemsPerChest;
+    }
+
+    public int getItemsPerChest() {
+        return itemsPerChest;
+    }
+
+    public void setChestType(ChestType chestType) {
+        this.chestType = chestType;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public ChestType getChestType() {
+        return chestType;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+}

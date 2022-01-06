@@ -1,6 +1,7 @@
 package me.wolf.wskywars.team;
 
 import me.wolf.wskywars.player.SkywarsPlayer;
+import org.bukkit.Sound;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,6 +43,10 @@ public class Team implements Comparable<Team> {
     }
     public void sendCenteredMessage(final String[] msg) {
         teamMembers.forEach(player -> player.sendCenteredMessage(msg));
+    }
+
+    public void playSound(final Sound sound) {
+        teamMembers.forEach(player -> player.getBukkitPlayer().playSound(player.getLocation(), sound, 0.8F, 0.8F));
     }
 
     @Override

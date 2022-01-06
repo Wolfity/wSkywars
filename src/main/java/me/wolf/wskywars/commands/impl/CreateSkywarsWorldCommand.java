@@ -26,11 +26,11 @@ public class CreateSkywarsWorldCommand extends SubCommand {
     protected void executeCommand(SkywarsPlayer player, String[] args, SkywarsPlugin plugin) {
         if (args.length != 2) {
             player.sendMessage(getUsage());
-        } else {
-            if (isAdmin(player)) {
-                player.sendMessage("&aSuccessfully created a new skywars world!");
-                new WorldCreator(args[1]).generator(new EmptyChunkGenerator()).createWorld();
-            } else player.sendMessage("&cNo Permission!");
+            return;
         }
+        if (isAdmin(player)) {
+            player.sendMessage("&aSuccessfully created a new skywars world!");
+            new WorldCreator(args[1]).generator(new EmptyChunkGenerator()).createWorld();
+        } else player.sendMessage("&cNo Permission!");
     }
 }

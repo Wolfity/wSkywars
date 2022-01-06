@@ -3,7 +3,9 @@ package me.wolf.wskywars;
 
 import me.wolf.wskywars.arena.ArenaManager;
 import me.wolf.wskywars.cage.CageManager;
+import me.wolf.wskywars.chest.SkywarsChestManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
+import me.wolf.wskywars.files.FileManager;
 import me.wolf.wskywars.game.GameManager;
 import me.wolf.wskywars.listeners.BlockBreak;
 import me.wolf.wskywars.listeners.BlockPlace;
@@ -31,6 +33,8 @@ public class SkywarsPlugin extends JavaPlugin {
     private GameManager gameManager;
     private SkywarsScoreboard scoreboard;
     private CageManager cageManager;
+    private FileManager fileManager;
+    private  SkywarsChestManager skywarsChestManager;
 
     @Override
     public void onEnable() {
@@ -90,11 +94,14 @@ public class SkywarsPlugin extends JavaPlugin {
         sqLiteManager.connect();
         this.arenaManager = new ArenaManager(this);
         arenaManager.loadArenas();
+        this.fileManager = new FileManager(this);
         this.playerManager = new PlayerManager();
         this.gameManager = new GameManager(this);
         this.scoreboard = new SkywarsScoreboard(this);
         this.cageManager = new CageManager();
+        this.skywarsChestManager = new SkywarsChestManager();
 
+        skywarsChestManager.loadChestItems(fileManager.getChestItemsConfig());
     }
 
     public ArenaManager getArenaManager() {
@@ -119,5 +126,13 @@ public class SkywarsPlugin extends JavaPlugin {
 
     public CageManager getCageManager() {
         return cageManager;
+    }
+
+    public FileManager getFileManager() {
+        return fileManager;
+    }
+
+    public SkywarsChestManager getSkywarsChestManager() {
+        return skywarsChestManager;
     }
 }

@@ -8,6 +8,7 @@ import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.team.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
@@ -36,8 +37,11 @@ public class GameManager {
                 arena.setArenaState(ArenaState.IN_COUNTDOWN);
                 arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.setPlayerState(PlayerState.IN_WAITING_ROOM)));
                 startLobbyCountdown(game);
+                plugin.getSkywarsChestManager().fillChests(game);
                 break;
             case INGAME:
+
+                chestRefillTimer(game);
                 startGameTimer(game);
                 arena.setArenaState(ArenaState.IN_GAME);
                 arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.setPlayerState(PlayerState.IN_GAME)));
@@ -108,7 +112,6 @@ public class GameManager {
                     availableTeam = new Team(getTeamName(freeArena), freeArena.getTeamSize());
                     availableTeam.addMember(player);
                     freeArena.addTeam(availableTeam);
-                    System.out.println("NOPE ");
                 }
                 prepareJoin(player, game);
                 player.sendMessage("&aSuccessfully joined team &2" + availableTeam.getName());
@@ -119,17 +122,14 @@ public class GameManager {
         } else {
             final Game game = getFreeGame(); // there is a free game
             game.getArena().getTeams().forEach(team -> {
-                System.out.println("in lambda");
                 if (team.getTeamMembers().size() < team.getSize()) { // check if there are any teams with a free spot
                     team.getTeamMembers().add(player);
                     player.sendMessage("&aSuccessfully joined team &2" + team.getName());
-                    System.out.println("Team with free spot?");
                 } else {
                     final Team newTeam = new Team(getTeamName(game.getArena()), game.getArena().getTeamSize());
                     newTeam.addMember(player);
                     game.getArena().addTeam(newTeam);
                     player.sendMessage("&aSuccessfully joined team &2" + newTeam.getName());
-                    System.out.println("new team added ");
                 }
             });
             prepareJoin(player, game);
@@ -184,6 +184,28 @@ public class GameManager {
                     arena.setGameTimer(arena.getArenaConfig().getInt("game-timer"));
                     setGameState(game, GameState.END);
                 }
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
+    }
+
+    private void chestRefillTimer(final Game game) {
+        final Arena arena = game.getArena();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (game.getGameState() == GameState.INGAME) {
+                    if (arena.getChestRefill() > 0) {
+                        arena.decrementChestRefill();
+                    } else { // chests have been refilled
+                        arena.setChestRefill(arena.getArenaConfig().getInt("chest-refill"));
+                        arena.getTeams().forEach(team -> {
+                            team.playSound(Sound.BLOCK_CHEST_OPEN);
+                            team.sendMessage("&a&lAll Chests have been refilled!");
+                        });
+                        plugin.getSkywarsChestManager().fillChests(game);
+
+                    }
+                } else  arena.setChestRefill(arena.getArenaConfig().getInt("chest-refill")); // reset them fully after the game ended
             }
         }.runTaskTimer(plugin, 0L, 20L);
     }
@@ -267,7 +289,6 @@ public class GameManager {
     private Game getFreeGame() {
         return games.stream().filter(game -> game.getGameState() == GameState.READY || game.getGameState() == GameState.COUNTDOWN).findFirst().orElse(null);
     }
-
 
     private char getTeamName(final Arena arena) {
         char i = (char) 65; // increase from 65 + 1, so it'll go from A -> B -> C, etc...

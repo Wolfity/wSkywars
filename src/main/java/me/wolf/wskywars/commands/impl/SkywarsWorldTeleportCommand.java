@@ -30,15 +30,16 @@ public class SkywarsWorldTeleportCommand extends SubCommand {
     protected void executeCommand(SkywarsPlayer player, String[] args, SkywarsPlugin plugin) {
         if (args.length != 2) {
             player.sendMessage(getUsage());
-        } else {
-            final String world = args[1];
-            final File worldFolder = new File(Bukkit.getServer().getWorldContainer(), world); // check if the world folder exists
-
-            if (worldFolder.exists()) { // if it does, load the world
-                player.sendMessage("&aSuccessfully teleported to the world " + world);
-                new WorldCreator(world).generator(new EmptyChunkGenerator()).createWorld();
-                player.teleport(new Location(Bukkit.getWorld(world), 0, 80, 0));
-            } else player.sendMessage("&cThis world does not exist!");
+            return;
         }
+        final String world = args[1];
+        final File worldFolder = new File(Bukkit.getServer().getWorldContainer(), world); // check if the world folder exists
+
+        if (worldFolder.exists()) { // if it does, load the world
+            player.sendMessage("&aSuccessfully teleported to the world " + world);
+            new WorldCreator(world).generator(new EmptyChunkGenerator()).createWorld();
+            player.teleport(new Location(Bukkit.getWorld(world), 0, 80, 0));
+        } else player.sendMessage("&cThis world does not exist!");
     }
 }
+

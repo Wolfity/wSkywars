@@ -28,7 +28,7 @@ public class SkywarsCommand extends Command {
 
         addSubCommand(true, new CreateSkywarsWorldCommand(), new CreateArenaCommand(),
                 new SkywarsWorldTeleportCommand(), new AddArenaSpawnCommand(),
-                new SetHubCommand());
+                new SetHubCommand(), new AddArenaChest());
 
     }
 
