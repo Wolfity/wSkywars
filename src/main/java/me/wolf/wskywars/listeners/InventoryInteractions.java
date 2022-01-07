@@ -35,7 +35,7 @@ public class InventoryInteractions implements Listener {
 
         switch (event.getMaterial()) {
             case DIAMOND_SWORD:
-                new KillEffectMenu(player);
+                new KillEffectMenu(player, plugin.getScoreboard());
                 break;
             case BLAZE_POWDER:
                 break;

@@ -5,7 +5,7 @@ import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.inventory.ItemStack;
 
-public abstract class KillEffect extends Cosmetic implements Comparable<KillEffect> {
+public abstract class KillEffect extends Cosmetic {
 
 
     public KillEffect(String name, ItemStack icon, int price) {
@@ -14,8 +14,5 @@ public abstract class KillEffect extends Cosmetic implements Comparable<KillEffe
 
     public abstract void playKillEffect(final SkywarsPlayer killedPlayer);
 
-    @Override
-    public int compareTo(KillEffect o) {
-        return getName().compareTo(o.getName());
-    }
+
 }

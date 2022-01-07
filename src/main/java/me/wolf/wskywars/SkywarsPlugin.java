@@ -5,6 +5,7 @@ import me.wolf.wskywars.arena.ArenaManager;
 import me.wolf.wskywars.cage.CageManager;
 import me.wolf.wskywars.chest.SkywarsChestManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
+import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.files.FileManager;
 import me.wolf.wskywars.game.GameManager;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffectManager;
@@ -59,7 +60,8 @@ public class SkywarsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         for (final SkywarsPlayer skywarsPlayer : playerManager.getSkywarsPlayers().values()) {
-            this.sqLiteManager.saveData(skywarsPlayer);
+            this.sqLiteManager.saveData(skywarsPlayer.getUuid());
+            this.sqLiteManager.saveCosmeticData(skywarsPlayer.getUuid(), CosmeticType.KILLEFFECT, skywarsPlayer.getKillEffects());
         }
         this.sqLiteManager.disconnect();
     }

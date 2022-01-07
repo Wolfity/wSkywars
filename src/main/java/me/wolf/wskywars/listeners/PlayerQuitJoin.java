@@ -1,9 +1,11 @@
 package me.wolf.wskywars.listeners;
 
 import me.wolf.wskywars.SkywarsPlugin;
+import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -19,16 +21,19 @@ public class PlayerQuitJoin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
-                plugin.getSqLiteManager().createPlayerData(event.getPlayer().getUniqueId(), event.getPlayer().getName()));
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getSqLiteManager().createPlayerData(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+            plugin.getPlayerManager().getSkywarsPlayer(event.getPlayer().getUniqueId()).setKillEffects(plugin.getKillEffectManager().getKillEffects());
+            plugin.getSqLiteManager().createCosmeticData(event.getPlayer().getUniqueId());
+        });
+
 
         // won't be null, since the object is created on join
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(event.getPlayer().getUniqueId());
             plugin.getScoreboard().lobbyScoreboard(skywarsPlayer);
             skywarsPlayer.giveLobbyInventory();
-            skywarsPlayer.setKillEffects(plugin.getKillEffectManager().getKillEffects());
-        },5L);
+        }, 5L);
 
     }
 
@@ -38,11 +43,17 @@ public class PlayerQuitJoin implements Listener {
         if (skywarsPlayer == null) return;
 
         // check if the player is ingame, handle their disconnection as a leave
-        if(skywarsPlayer.getPlayerState() != PlayerState.IN_LOBBY) {
+        if (skywarsPlayer.getPlayerState() != PlayerState.IN_LOBBY) {
             plugin.getGameManager().leaveGame(skywarsPlayer, false);
-            // saving data to the database
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getSqLiteManager().saveData(skywarsPlayer));
         }
+        // saving data to the database
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getSqLiteManager().saveData(event.getPlayer().getUniqueId());
+            plugin.getSqLiteManager().saveCosmeticData(event.getPlayer().getUniqueId(), CosmeticType.KILLEFFECT, skywarsPlayer.getKillEffects());
+        });
+
+
+        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getPlayerManager().removeSkywarsPlayer(event.getPlayer().getUniqueId()), 20);
     }
 
 }

@@ -1,10 +1,11 @@
 package me.wolf.wskywars.player;
 
+import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.cage.Cage;
+import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
+import org.bukkit.Bukkit;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerManager {
 
@@ -37,6 +38,15 @@ public class PlayerManager {
      */
     public void loadSkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins, final Cage cage) {
         this.skywarsPlayers.put(uuid, new SkywarsPlayer(uuid, wins, kills, coins, cage));
+    }
+
+    /**
+     * @param skywarsPlayer The player's whose cosmetics will be loaded
+     * @param killEffects the killEffectData string we will process
+     * @param plugin instance of main class
+     */
+    public void loadCosmetics(final SkywarsPlayer skywarsPlayer, final String killEffects, final SkywarsPlugin plugin) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getSqLiteManager().loadKillEffects(skywarsPlayer.getUuid(), killEffects));
     }
 
     public Map<UUID, SkywarsPlayer> getSkywarsPlayers() {

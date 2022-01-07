@@ -1,6 +1,7 @@
 package me.wolf.wskywars.player;
 
 import me.wolf.wskywars.cage.Cage;
+import me.wolf.wskywars.cosmetics.Cosmetic;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
 import me.wolf.wskywars.cosmetics.killeffect.types.DefaultKillEffect;
 import me.wolf.wskywars.utils.ItemUtils;
@@ -200,6 +201,10 @@ public class SkywarsPlayer {
     public void setActiveKillEffect(final KillEffect newActiveEffect) {
         killEffects.stream().filter(KillEffect::isUnlocked).filter(KillEffect::isActive).forEach(killEffect -> killEffect.setActive(false));
         newActiveEffect.setActive(true);
+    }
+
+    public void unlockCosmetic(final Cosmetic cosmetic) {
+        cosmetic.setUnlocked(true);
     }
 
     @Override

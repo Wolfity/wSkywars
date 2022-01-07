@@ -2,6 +2,7 @@ package me.wolf.wskywars.cosmetics.killeffect;
 
 import me.wolf.wskywars.cosmetics.killeffect.types.*;
 import me.wolf.wskywars.files.YamlConfig;
+import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -41,11 +42,18 @@ public class KillEffectManager {
                     case "lava":
                         killEffects.add(new LavaKillEffect(icon, price));
                         break;
+                    case "notes":
+                        killEffects.add(new NoteKillEffect(icon, price));
+                        break;
                 }
 
             }
         }
         killEffects.add(new DefaultKillEffect());
+    }
+
+    public KillEffect getKillEffectByName(final String name) {
+        return killEffects.stream().filter(killEffect -> killEffect.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     public Set<KillEffect> getKillEffects() {

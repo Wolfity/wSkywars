@@ -19,13 +19,18 @@ kill-effects:
     price: 200
     icon-material: WHEAT
     icon-name: "&aHappy Villager"
-  lava:
+  water:
     enabled: true
     price: 100
     icon-material: WATER_BUCKET
     icon-name: "&9Water"
-  water:
+  lava:
     enabled: true
     price: 150
     icon-material: LAVA_BUCKET
-    icon-name: "&6Water"
+    icon-name: "&6Lava"
+  notes:
+    enabled: true
+    price: 500
+    icon-material: MUSIC_DISC_BLOCKS
+    icon-name: "&bNotes"
