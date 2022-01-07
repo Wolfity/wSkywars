@@ -1,0 +1,31 @@
+kill-effects:
+  explosion:
+    enabled: true
+    price: 100
+    icon-material: TNT
+    icon-name: "&cExplosion"
+  hearts:
+    enabled: true
+    price: 150
+    icon-material: GOLDEN_APPLE
+    icon-name: "&cHearts"
+  angryvillager:
+    enabled: true
+    price: 200
+    icon-material: FIRE_CHARGE
+    icon-name: "&cAngry Villager"
+  happyvillager:
+    enabled: true
+    price: 200
+    icon-material: WHEAT
+    icon-name: "&aHappy Villager"
+  lava:
+    enabled: true
+    price: 100
+    icon-material: WATER_BUCKET
+    icon-name: "&9Water"
+  water:
+    enabled: true
+    price: 150
+    icon-material: LAVA_BUCKET
+    icon-name: "&6Water"

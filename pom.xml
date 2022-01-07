@@ -49,6 +49,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Particle -->
+        <dependency>
+            <groupId>xyz.xenondevs</groupId>
+            <artifactId>particle</artifactId>
+            <version>1.7</version>
+        </dependency>
+
         <!-- World Edit -->
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>

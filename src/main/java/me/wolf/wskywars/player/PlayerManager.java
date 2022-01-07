@@ -10,7 +10,6 @@ public class PlayerManager {
 
     private final Map<UUID, SkywarsPlayer> skywarsPlayers = new HashMap<>();
 
-
     /**
      * @param uuid: the SkywarsPlayer value matching the UUID key
      * @return a SkywarsPlayer object if it exists

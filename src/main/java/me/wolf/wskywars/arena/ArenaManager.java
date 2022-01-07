@@ -85,8 +85,7 @@ public class ArenaManager {
                     (float) cfg.getDouble("center.pitch"),
                     (float) cfg.getDouble("center.yaw"));
 
-            System.out.println("chests " + chests.size());
-            System.out.println("spawns " + spawns.size());
+
             arena.setCenter(center);
             final int minTeams = cfg.getInt("min-teams");
             final int maxTeams = cfg.getInt("max-teams");

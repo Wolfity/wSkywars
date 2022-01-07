@@ -1,16 +1,19 @@
 package me.wolf.wskywars.player;
 
 import me.wolf.wskywars.cage.Cage;
+import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
+import me.wolf.wskywars.cosmetics.killeffect.types.DefaultKillEffect;
+import me.wolf.wskywars.utils.ItemUtils;
 import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class SkywarsPlayer {
 
@@ -19,6 +22,7 @@ public class SkywarsPlayer {
     private boolean isSpectator;
     private PlayerState playerState;
     private Cage cage;
+    private Set<KillEffect> killEffects;
 
     // creating a first time object
     public SkywarsPlayer(final UUID uuid) {
@@ -28,6 +32,7 @@ public class SkywarsPlayer {
         this.coins = 0;
         this.isSpectator = false;
         this.playerState = PlayerState.IN_LOBBY;
+        this.killEffects = new HashSet<>();
     }
 
     public SkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins, final Cage cage) {
@@ -42,6 +47,14 @@ public class SkywarsPlayer {
 
     public Cage getCage() {
         return cage;
+    }
+
+    public Set<KillEffect> getKillEffects() {
+        return killEffects;
+    }
+
+    public void setKillEffects(Set<KillEffect> killEffects) {
+        this.killEffects = killEffects;
     }
 
     public void setCage(Cage cage) {
@@ -172,6 +185,21 @@ public class SkywarsPlayer {
 
     public float getPitch() {
         return getLocation().getPitch();
+    }
+
+    public void giveLobbyInventory() {
+        getInventory().setItem(3,ItemUtils.createItem(Material.DIAMOND_SWORD, "&eKill Effects"));
+        getInventory().setItem(4,ItemUtils.createItem(Material.BLAZE_POWDER, "&eWin Effects"));
+        getInventory().setItem(5,ItemUtils.createItem(Material.GREEN_STAINED_GLASS, "&eCages"));
+    }
+    // getting the active kill effect, if there is none, return the default effect
+    public KillEffect getActiveKillEffect() {
+        return killEffects.stream().filter(KillEffect::isActive).findFirst().orElse(new DefaultKillEffect());
+    }
+    // setting the current active killeffect to false, and after that, setting a new active effect
+    public void setActiveKillEffect(final KillEffect newActiveEffect) {
+        killEffects.stream().filter(KillEffect::isUnlocked).filter(KillEffect::isActive).forEach(killEffect -> killEffect.setActive(false));
+        newActiveEffect.setActive(true);
     }
 
     @Override

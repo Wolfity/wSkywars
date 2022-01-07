@@ -23,7 +23,12 @@ public class PlayerQuitJoin implements Listener {
                 plugin.getSqLiteManager().createPlayerData(event.getPlayer().getUniqueId(), event.getPlayer().getName()));
 
         // won't be null, since the object is created on join
-        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getScoreboard().lobbyScoreboard(plugin.getPlayerManager().getSkywarsPlayer(event.getPlayer().getUniqueId())),5L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(event.getPlayer().getUniqueId());
+            plugin.getScoreboard().lobbyScoreboard(skywarsPlayer);
+            skywarsPlayer.giveLobbyInventory();
+            skywarsPlayer.setKillEffects(plugin.getKillEffectManager().getKillEffects());
+        },5L);
 
     }
 

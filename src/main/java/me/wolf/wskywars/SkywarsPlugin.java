@@ -7,10 +7,12 @@ import me.wolf.wskywars.chest.SkywarsChestManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
 import me.wolf.wskywars.files.FileManager;
 import me.wolf.wskywars.game.GameManager;
+import me.wolf.wskywars.cosmetics.killeffect.KillEffectManager;
 import me.wolf.wskywars.listeners.BlockBreak;
 import me.wolf.wskywars.listeners.BlockPlace;
 import me.wolf.wskywars.listeners.InventoryInteractions;
 import me.wolf.wskywars.listeners.PlayerQuitJoin;
+import me.wolf.wskywars.menu.MenuListener;
 import me.wolf.wskywars.player.PlayerManager;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.scoreboard.SkywarsScoreboard;
@@ -34,9 +36,11 @@ public class SkywarsPlugin extends JavaPlugin {
     private SkywarsScoreboard scoreboard;
     private CageManager cageManager;
     private FileManager fileManager;
-    private  SkywarsChestManager skywarsChestManager;
+    private SkywarsChestManager skywarsChestManager;
+    private KillEffectManager killEffectManager;
 
     @Override
+
     public void onEnable() {
         final File folder = new File(this.getDataFolder() + "/arenas");
         final File schemFolder = new File("schematics/cages");
@@ -85,7 +89,8 @@ public class SkywarsPlugin extends JavaPlugin {
                 new PlayerQuitJoin(this),
                 new BlockBreak(this),
                 new BlockPlace(this),
-                new InventoryInteractions(this)
+                new InventoryInteractions(this),
+                new MenuListener(playerManager)
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 
@@ -100,7 +105,9 @@ public class SkywarsPlugin extends JavaPlugin {
         this.scoreboard = new SkywarsScoreboard(this);
         this.cageManager = new CageManager();
         this.skywarsChestManager = new SkywarsChestManager();
+        this.killEffectManager = new KillEffectManager();
 
+        killEffectManager.loadKillEffects(fileManager.getKillEffectsConfig());
         skywarsChestManager.loadChestItems(fileManager.getChestItemsConfig());
     }
 
@@ -130,6 +137,10 @@ public class SkywarsPlugin extends JavaPlugin {
 
     public FileManager getFileManager() {
         return fileManager;
+    }
+
+    public KillEffectManager getKillEffectManager() {
+        return killEffectManager;
     }
 
     public SkywarsChestManager getSkywarsChestManager() {

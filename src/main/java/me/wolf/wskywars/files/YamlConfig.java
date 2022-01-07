@@ -40,9 +40,6 @@ public class YamlConfig {
     }
 
 
-    public File getConfigFile() {
-        return configFile;
-    }
 
     public FileConfiguration getConfig() {
         return config;

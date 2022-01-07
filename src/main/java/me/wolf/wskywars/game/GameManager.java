@@ -169,7 +169,6 @@ public class GameManager {
         if (arena.getTeams().size() >= arena.getMinTeams()) {
             setGameState(game, GameState.COUNTDOWN);
         }
-        System.out.println("TEAMS " + game.getArena().getTeams().size());
     }
 
     private void startGameTimer(final Game game) {
