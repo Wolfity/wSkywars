@@ -4,6 +4,8 @@ import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.cosmetics.Cosmetic;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
 import me.wolf.wskywars.cosmetics.killeffect.types.DefaultKillEffect;
+import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
+import me.wolf.wskywars.cosmetics.wineffect.types.DefaultWinEffect;
 import me.wolf.wskywars.utils.ItemUtils;
 import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
@@ -24,6 +26,7 @@ public class SkywarsPlayer {
     private PlayerState playerState;
     private Cage cage;
     private Set<KillEffect> killEffects;
+    private Set<WinEffect> winEffects;
 
     // creating a first time object
     public SkywarsPlayer(final UUID uuid) {
@@ -34,6 +37,7 @@ public class SkywarsPlayer {
         this.isSpectator = false;
         this.playerState = PlayerState.IN_LOBBY;
         this.killEffects = new HashSet<>();
+        this.winEffects = new HashSet<>();
     }
 
     public SkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins, final Cage cage) {
@@ -199,12 +203,26 @@ public class SkywarsPlayer {
     }
     // setting the current active killeffect to false, and after that, setting a new active effect
     public void setActiveKillEffect(final KillEffect newActiveEffect) {
-        killEffects.stream().filter(KillEffect::isUnlocked).filter(KillEffect::isActive).forEach(killEffect -> killEffect.setActive(false));
         newActiveEffect.setActive(true);
+    }
+
+    public void setActiveWinEffect(WinEffect newActiveWinEffect) {
+        newActiveWinEffect.setActive(true);
     }
 
     public void unlockCosmetic(final Cosmetic cosmetic) {
         cosmetic.setUnlocked(true);
+    }
+
+    public Set<WinEffect> getWinEffects() {
+        return winEffects;
+    }
+    public WinEffect getActiveWinEffect() {
+        return winEffects.stream().filter(WinEffect::isActive).findFirst().orElse(new DefaultWinEffect());
+    }
+
+    public void setWinEffects(Set<WinEffect> winEffects) {
+        this.winEffects = winEffects;
     }
 
     @Override

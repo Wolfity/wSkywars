@@ -6,6 +6,9 @@ import me.wolf.wskywars.cage.CageManager;
 import me.wolf.wskywars.chest.SkywarsChestManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
 import me.wolf.wskywars.cosmetics.CosmeticType;
+import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
+import me.wolf.wskywars.cosmetics.wineffect.WinEffectListener;
+import me.wolf.wskywars.cosmetics.wineffect.WinEffectManager;
 import me.wolf.wskywars.files.FileManager;
 import me.wolf.wskywars.game.GameManager;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffectManager;
@@ -22,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -39,6 +43,7 @@ public class SkywarsPlugin extends JavaPlugin {
     private FileManager fileManager;
     private SkywarsChestManager skywarsChestManager;
     private KillEffectManager killEffectManager;
+    private WinEffectManager winEffectManager;
 
     @Override
 
@@ -55,13 +60,15 @@ public class SkywarsPlugin extends JavaPlugin {
         registerManagers();
         registerListeners();
         registerCommands();
+
+
     }
 
     @Override
     public void onDisable() {
         for (final SkywarsPlayer skywarsPlayer : playerManager.getSkywarsPlayers().values()) {
             this.sqLiteManager.saveData(skywarsPlayer.getUuid());
-            this.sqLiteManager.saveCosmeticData(skywarsPlayer.getUuid(), CosmeticType.KILLEFFECT, skywarsPlayer.getKillEffects());
+            this.sqLiteManager.saveCosmeticData(skywarsPlayer.getUuid());
         }
         this.sqLiteManager.disconnect();
     }
@@ -92,7 +99,8 @@ public class SkywarsPlugin extends JavaPlugin {
                 new BlockBreak(this),
                 new BlockPlace(this),
                 new InventoryInteractions(this),
-                new MenuListener(playerManager)
+                new MenuListener(playerManager),
+                new WinEffectListener(this)
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 
@@ -108,7 +116,9 @@ public class SkywarsPlugin extends JavaPlugin {
         this.cageManager = new CageManager();
         this.skywarsChestManager = new SkywarsChestManager();
         this.killEffectManager = new KillEffectManager();
+        this.winEffectManager = new WinEffectManager();
 
+        winEffectManager.loadWinEffects(fileManager.getWinEffectsConfig());
         killEffectManager.loadKillEffects(fileManager.getKillEffectsConfig());
         skywarsChestManager.loadChestItems(fileManager.getChestItemsConfig());
     }
@@ -147,5 +157,9 @@ public class SkywarsPlugin extends JavaPlugin {
 
     public SkywarsChestManager getSkywarsChestManager() {
         return skywarsChestManager;
+    }
+
+    public WinEffectManager getWinEffectManager() {
+        return winEffectManager;
     }
 }

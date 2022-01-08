@@ -53,7 +53,7 @@ public class KillEffectManager {
     }
 
     public KillEffect getKillEffectByName(final String name) {
-        return killEffects.stream().filter(killEffect -> killEffect.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return killEffects.stream().filter(killEffect -> killEffect.getName().equalsIgnoreCase(name)).findFirst().orElse(new DefaultKillEffect());
     }
 
     public Set<KillEffect> getKillEffects() {

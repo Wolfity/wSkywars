@@ -1,7 +1,8 @@
 package me.wolf.wskywars.listeners;
 
 import me.wolf.wskywars.SkywarsPlugin;
-import me.wolf.wskywars.menu.types.KillEffectMenu;
+import me.wolf.wskywars.cosmetics.CosmeticType;
+import me.wolf.wskywars.menu.types.CosmeticMenu;
 import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.entity.Player;
@@ -35,9 +36,10 @@ public class InventoryInteractions implements Listener {
 
         switch (event.getMaterial()) {
             case DIAMOND_SWORD:
-                new KillEffectMenu(player, plugin.getScoreboard());
+                new CosmeticMenu(player, CosmeticType.KILLEFFECT, plugin.getScoreboard());
                 break;
             case BLAZE_POWDER:
+                new CosmeticMenu(player, CosmeticType.WINEFFECT, plugin.getScoreboard());
                 break;
             case GREEN_STAINED_GLASS:
                 break;

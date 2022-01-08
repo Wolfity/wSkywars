@@ -1,0 +1,27 @@
+win-effects:
+  explosion:
+    enabled: true
+    icon-material: TNT
+    icon-name: "&cExplosion"
+    price: 50
+  firework:
+    enabled: true
+    icon-material: FIREWORK_ROCKET
+    icon-name: "&aFire Work"
+    price: 150
+  icewalker:
+    enabled: true
+    icon-material: FROSTED_ICE
+    icon-name: "&bIce Walker"
+    price: 500
+  speedy:
+    enabled: true
+    icon-material: SUGAR
+    icon-name: "&eSpeedy Dude"
+    price: 350
+  launcher:
+    enabled: true
+    icon-material: STICK
+    icon-name: "&cLauncher"
+    price: 750
+

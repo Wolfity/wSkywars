@@ -1,15 +1,16 @@
 package me.wolf.wskywars.listeners;
 
 import me.wolf.wskywars.SkywarsPlugin;
-import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.UUID;
 
 public class PlayerQuitJoin implements Listener {
 
@@ -21,19 +22,24 @@ public class PlayerQuitJoin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            plugin.getSqLiteManager().createPlayerData(event.getPlayer().getUniqueId(), event.getPlayer().getName());
-            plugin.getPlayerManager().getSkywarsPlayer(event.getPlayer().getUniqueId()).setKillEffects(plugin.getKillEffectManager().getKillEffects());
-            plugin.getSqLiteManager().createCosmeticData(event.getPlayer().getUniqueId());
+            plugin.getSqLiteManager().createPlayerData(player.getUniqueId(), player.getName());
+            plugin.getSqLiteManager().createCosmeticData(player.getUniqueId());
+            // give the player ALL cosmetics (locked)
         });
 
 
         // won't be null, since the object is created on join
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(event.getPlayer().getUniqueId());
+            final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(player.getUniqueId());
+            skywarsPlayer.setWinEffects(plugin.getWinEffectManager().getWinEffects());
+            skywarsPlayer.setKillEffects(plugin.getKillEffectManager().getKillEffects());
+
             plugin.getScoreboard().lobbyScoreboard(skywarsPlayer);
+
             skywarsPlayer.giveLobbyInventory();
-        }, 5L);
+        }, 10L);
 
     }
 
@@ -49,7 +55,7 @@ public class PlayerQuitJoin implements Listener {
         // saving data to the database
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             plugin.getSqLiteManager().saveData(event.getPlayer().getUniqueId());
-            plugin.getSqLiteManager().saveCosmeticData(event.getPlayer().getUniqueId(), CosmeticType.KILLEFFECT, skywarsPlayer.getKillEffects());
+            plugin.getSqLiteManager().saveCosmeticData(event.getPlayer().getUniqueId());
         });
 
 

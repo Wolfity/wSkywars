@@ -30,7 +30,7 @@ public class SkywarsScoreboard {
         header.addEntry(Utils.colorize("&7Header :)"));
         header.setPrefix("");
         header.setSuffix("");
-        objective.getScore(Utils.colorize("&7Header :) ")).setScore(5);
+        objective.getScore(Utils.colorize("&7Header :) ")).setScore(6);
 
         final Team empty1 = scoreboard.registerNewTeam("empty1");
         empty1.addEntry(" ");
@@ -42,19 +42,31 @@ public class SkywarsScoreboard {
         wins.addEntry(Utils.colorize("&8Wins: "));
         wins.setPrefix("");
         wins.setSuffix(Utils.colorize("&e " + player.getWins()));
-        objective.getScore(Utils.colorize("&8Wins: ")).setScore(3);
+        objective.getScore(Utils.colorize("&8Wins: ")).setScore(5);
 
         final Team kills = scoreboard.registerNewTeam("kills");
         kills.addEntry(Utils.colorize("&8Kills: "));
         kills.setPrefix("");
         kills.setSuffix(Utils.colorize("&e " + player.getKills()));
-        objective.getScore(Utils.colorize("&8Kills: ")).setScore(2);
+        objective.getScore(Utils.colorize("&8Kills: ")).setScore(4);
 
         final Team coins = scoreboard.registerNewTeam("coins");
         coins.addEntry(Utils.colorize("&8Coins: "));
         coins.setPrefix("");
         coins.setSuffix(Utils.colorize("&e " + player.getCoins()));
-        objective.getScore(Utils.colorize("&8Coins: ")).setScore(1);
+        objective.getScore(Utils.colorize("&8Coins: ")).setScore(3);
+
+        final Team killeffect = scoreboard.registerNewTeam("killeffect");
+        killeffect.addEntry(Utils.colorize("&7Kill Effect: &e"));
+        killeffect.setPrefix("");
+        killeffect.setSuffix(player.getActiveKillEffect().getName());
+        objective.getScore(Utils.colorize("&7Kill Effect: &e")).setScore(2);
+
+        final Team wineffect = scoreboard.registerNewTeam("wineffect");
+        wineffect.addEntry(Utils.colorize("&7Kill Effect: &e"));
+        wineffect.setPrefix("");
+        wineffect.setSuffix(player.getActiveWinEffect().getName());
+        objective.getScore(Utils.colorize("&7Win Effect: &e")).setScore(1);
 
 
         player.getBukkitPlayer().setScoreboard(scoreboard);

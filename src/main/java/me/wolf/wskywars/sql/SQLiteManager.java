@@ -5,14 +5,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.cosmetics.Cosmetic;
-import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
+import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.sql.*;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -49,7 +48,7 @@ public class SQLiteManager {
              final Statement statement = connection.createStatement()) {
 
             statement.executeUpdate(Query.CREATE_TABLE);
-            statement.executeUpdate(Query.CREATE_COSMETICS_TABLE);
+            statement.executeUpdate(Query.CREATE_UNLOCKED_COSMETIC_TABLE);
 
         } catch (final SQLException e) {
             e.printStackTrace();
@@ -69,6 +68,9 @@ public class SQLiteManager {
                 ps.setInt(3, 0); // wins
                 ps.setInt(4, 0); // kills
                 ps.setInt(5, 0); // coins
+                ps.setString(6, "default"); // kill effect
+                ps.setString(7, "default"); // win effect
+                ps.setString(8, "default"); // cage
 
                 plugin.getPlayerManager().addSkywarsPlayer(uuid);
 
@@ -88,11 +90,18 @@ public class SQLiteManager {
         this.setWins(uuid, this.getWins(uuid));
         this.setKills(uuid, this.getKills(uuid));
         this.setCoins(uuid, this.getCoins(uuid));
-        plugin.getPlayerManager().loadSkywarsPlayer(
+        this.setActiveCosmetic(uuid, "activekilleffect", this.getActiveCosmetic(uuid, "activekilleffect"));
+        this.setActiveCosmetic(uuid, "activewineffect", this.getActiveCosmetic(uuid, "activewineffect"));
+
+        final SkywarsPlayer swPlayer = plugin.getPlayerManager().loadSkywarsPlayer(
                 uuid,
                 getWins(uuid),
                 getKills(uuid),
                 getCoins(uuid), new Cage("defaultcage"));
+
+        swPlayer.setActiveKillEffect(plugin.getKillEffectManager().getKillEffectByName(getActiveCosmetic(uuid, "activekilleffect")));
+        swPlayer.setActiveWinEffect(plugin.getWinEffectManager().getWinEffectByName(getActiveCosmetic(uuid, "activewineffect")));
+
         //TODO change this, this is default rn because I dont have multiple cages yet
     }
 
@@ -147,7 +156,6 @@ public class SQLiteManager {
 
         try (final Connection connection = hikari.getConnection();
              final PreparedStatement ps = connection.prepareStatement(Query.GET_PLAYERDATA)) {
-
             ps.setString(1, uuid.toString());
 
             final ResultSet results = ps.executeQuery();
@@ -159,6 +167,7 @@ public class SQLiteManager {
 
         return 0;
     }
+
 
     public void setKills(final UUID uuid, final int kills) {
         try (final Connection connection = hikari.getConnection();
@@ -221,15 +230,100 @@ public class SQLiteManager {
         return 0;
     }
 
+    /**
+     * @param uuid the user's cosmetics we are going to update
+     * @param type the cosmetic type (killeffects, wineffects, cages)
+     * @param data the data string we are processing
+     */
+    public void setUnlockedCosmetics(final UUID uuid, final String type, final String data) {
+        try (final Connection connection = hikari.getConnection();
+             final PreparedStatement ps = connection.prepareStatement("UPDATE unlocked SET " + type + " = ? WHERE uuid = ?")) {
+
+            ps.setString(1, data);
+            ps.setString(2, uuid.toString());
+
+            ps.executeUpdate();
+
+        } catch (final SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param uuid the user's cosmetics we are going to update
+     * @param type the cosmetic type (killeffects, wineffects, cages)
+     * @return a String with the cosmetic data
+     */
+    public String getUnlockedCosmetics(final UUID uuid, final String type) {
+        try (final Connection connection = hikari.getConnection();
+             final PreparedStatement ps = connection.prepareStatement("SELECT " + type + " FROM unlocked WHERE uuid = ?")) {
+
+            ps.setString(1, uuid.toString());
+
+            final ResultSet results = ps.executeQuery();
+            return results.getString(type);
+        } catch (final SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "default";
+    }
+
+    /**
+     * @param uuid the UUID we are requesting data from
+     * @param type the active cosmetic type we are requesting (activekilleffect, activewineffect, activecage)
+     * @return name of the active cosmetic
+     */
+    public String getActiveCosmetic(final UUID uuid, final String type) {
+        try (final Connection connection = hikari.getConnection();
+             final PreparedStatement ps = connection.prepareStatement("SELECT " + type + " FROM players WHERE uuid = ?")) {
+
+            ps.setString(1, uuid.toString());
+
+            final ResultSet results = ps.executeQuery();
+            return results.getString(type);
+        } catch (final SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "default";
+    }
+
+    /**
+     * @param uuid the UUID we are requesting data from
+     * @param type the active cosmetic type we are requesting (activekilleffect, activewineffect, activecage)
+     * @param data the data String we are saving
+     */
+    public void setActiveCosmetic(final UUID uuid, final String type, final String data) {
+        try (final Connection connection = hikari.getConnection();
+             final PreparedStatement ps = connection.prepareStatement("UPDATE players SET " + type + " = ? WHERE uuid = ?")) {
+
+            ps.setString(1, data);
+            ps.setString(2, uuid.toString());
+
+            ps.executeUpdate();
+
+        } catch (final SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void saveData(final UUID uuid) { // saving all data of the specified player
         this.setPlayerName(uuid, Bukkit.getOfflinePlayer(uuid).getName());
         final SkywarsPlayer player = plugin.getPlayerManager().getSkywarsPlayer(uuid);
         this.setWins(uuid, player.getWins());
         this.setKills(uuid, player.getKills());
         this.setCoins(uuid, player.getCoins());
+        this.setActiveCosmetic(uuid, "activekilleffect", processActiveCosmeticToString(player.getActiveKillEffect()));
+        this.setActiveCosmetic(uuid, "activewineffect", processActiveCosmeticToString(player.getActiveWinEffect()));
+
+        //todo add cage
     }
 
-
+    /**
+     * @param uuid: Check if a UUID exists in the database
+     * @return True if the UUID exists, false if not
+     */
     public boolean doesCosmeticPlayerExist(final UUID uuid) { // checking if a specific player exists in the database
         try (final Connection connection = hikari.getConnection();
              final PreparedStatement ps = connection.prepareStatement(Query.GET_COSMETIC_DATA)) {
@@ -243,58 +337,18 @@ public class SQLiteManager {
         return false;
     }
 
-
-    public void setKillEffects(final UUID uuid, final String killEffect) {
-        try (final Connection connection = hikari.getConnection();
-             final PreparedStatement ps = connection.prepareStatement(Query.SET_KILLEFFECTS)) {
-
-            ps.setString(1, killEffect);
-            ps.setString(2, uuid.toString());
-
-            ps.executeUpdate();
-
-        } catch (final SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getKillEffect(final UUID uuid) {
-
-        try (final Connection connection = hikari.getConnection();
-             final PreparedStatement ps = connection.prepareStatement(Query.GET_COSMETIC_DATA)) {
-
-            ps.setString(1, uuid.toString());
-
-            final ResultSet results = ps.executeQuery();
-
-            return results.getString("killeffects");
-        } catch (final SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-
     public void createCosmeticData(final UUID uuid) { // if the player exists, load their data, else create new data
         if (doesCosmeticPlayerExist(uuid)) {
-            loadCosmeticData(plugin.getPlayerManager().getSkywarsPlayer(uuid));
+            loadCosmeticData(uuid);
         } else {
+
             try (final Connection connection = hikari.getConnection();
                  final PreparedStatement ps = connection.prepareStatement(Query.CREATE_COSMETIC_DATA)) {
-                final Set<KillEffect> killEffects = plugin.getKillEffectManager().getKillEffects();
-
-                final String killEffectData = cosmeticSetToString(killEffects);
-
 
                 ps.setString(1, uuid.toString());
-                ps.setString(2, killEffectData); // killeffects
-                ps.setString(3, "none"); // wineffects
-                ps.setString(4, "none"); // cages
-
-
-
-                plugin.getPlayerManager().getSkywarsPlayer(uuid).setKillEffects(stringToKillEffectSet(killEffectData));
+                ps.setString(2, "default"); // kill effects
+                ps.setString(3, "default"); // win effects
+                ps.setString(4, "default"); // cages
 
                 ps.executeUpdate();
 
@@ -304,64 +358,76 @@ public class SQLiteManager {
         }
     }
 
-    public void loadKillEffects(final UUID uuid, final String killData) {
+    /**
+     * @param uuid: Load all the cosmetic data from the user's UUID
+     */
+    private void loadCosmeticData(final UUID uuid) { // load data of an existing player
+        this.setUnlockedCosmetics(uuid, "killeffects" ,this.getUnlockedCosmetics(uuid, "killeffects"));
+        this.setUnlockedCosmetics(uuid, "wineffects" ,this.getUnlockedCosmetics(uuid, "wineffects"));
+
         final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(uuid);
-        final Set<KillEffect> killEffects = skywarsPlayer.getKillEffects();
+        skywarsPlayer.setWinEffects(plugin.getWinEffectManager().getWinEffects());
+        skywarsPlayer.setKillEffects(plugin.getKillEffectManager().getKillEffects());
 
-        final String[] splitData = killData.split(";"); // is a String killeffect:unlocked/active
-        for (final String effect : splitData) {
-            final String[] splitResult = effect.split(":"); // returns killeffect unlocked active
-            final KillEffect killEffect = plugin.getKillEffectManager().getKillEffectByName(splitResult[0]);
-            killEffect.setUnlocked(Boolean.parseBoolean(splitResult[1]));
-            killEffect.setActive(Boolean.parseBoolean(splitResult[2]));
-            killEffects.add(killEffect);
+        final Set<KillEffect> unlockedKillEffects = getKillEffectsOfString(getUnlockedCosmetics(uuid, "killeffects"));
+        final Set<WinEffect> unlockedWinEffects = getWinEffectsOfString(getUnlockedCosmetics(uuid, "wineffects"));
 
-        }
-        skywarsPlayer.setKillEffects(killEffects);
-    }
 
-    private void loadCosmeticData(final SkywarsPlayer skywarsPlayer) {
-        this.setKillEffects(skywarsPlayer.getUuid(), getKillEffect(skywarsPlayer.getUuid()));
-
-        plugin.getPlayerManager().loadCosmetics(skywarsPlayer, this.getKillEffect(skywarsPlayer.getUuid()), plugin);
-
-    }
-
-    public void saveCosmeticData(final UUID uuid, final CosmeticType cosmeticType, final Set<KillEffect> data) {
-        switch (cosmeticType) {
-            case KILLEFFECT:
-                this.setKillEffects(uuid, cosmeticSetToString(data));
-                break;
-            case WINEFFECT:
-                break;
-            case CAGE:
-                break;
+        // loop over all the kill/win effects, then check which ones the player has unlocked, and set them unlocked
+        for(final KillEffect killEffect : skywarsPlayer.getKillEffects()) {
+            if(unlockedKillEffects.contains(killEffect)) {
+                killEffect.setUnlocked(true);
+            }
         }
 
+        for(final WinEffect winEffect : skywarsPlayer.getWinEffects()) {
+            if (unlockedWinEffects.contains(winEffect)) {
+                winEffect.setUnlocked(true);
+            }
+        }
+
+        //TODO change this, this is default rn because I dont have multiple cages yet
     }
 
-    private String cosmeticSetToString(final Set<KillEffect> killEffects) {
-        final StringBuilder killEffectData = new StringBuilder();
-        killEffects.forEach(killEffect -> { // notes:true:false --> notes = unlocked but is not active
-            killEffectData.append(killEffect.getName()).append(":").append(killEffect.isUnlocked()).append(":").append(killEffect.isActive()).append(";");
+
+    public void saveCosmeticData(final UUID uuid) {
+        final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(uuid);
+        this.setUnlockedCosmetics(uuid, "killeffects", processUnlockedCosmeticsToString(skywarsPlayer.getKillEffects()));
+        this.setUnlockedCosmetics(uuid, "wineffects", processUnlockedCosmeticsToString(skywarsPlayer.getWinEffects()));
+
+    }
+
+    private <T extends Cosmetic> String processUnlockedCosmeticsToString(final Set<T> cosmetics) {
+        final StringBuilder sb = new StringBuilder();
+        cosmetics.stream().filter(Cosmetic::isUnlocked).forEach(cosmetic -> {
+            sb.append(cosmetic.getName()).append(" ");
         });
-
-        return killEffectData.toString();
+        if (sb.length() == 0) {
+            sb.append("default");
+        }
+        return sb.toString();
     }
 
-    private Set<KillEffect> stringToKillEffectSet(final String killEffectData) {
+    private <T extends Cosmetic> String processActiveCosmeticToString(final T cosmetic) {
+        if (cosmetic == null) {
+            return "default";
+        }
+        return cosmetic.getName();
+    }
+    private Set<KillEffect> getKillEffectsOfString(final String s) {
         final Set<KillEffect> killEffects = new HashSet<>();
-        final String[] oneEffect = killEffectData.split(";"); // returns notes:unlocked:active
-
-        for(final String effect : oneEffect) {
-            final String[] effectSplit = effect.split(":"); // splits into 3 seperate parts
-
-            final KillEffect killEffect = plugin.getKillEffectManager().getKillEffectByName(effectSplit[0]);
-            killEffect.setUnlocked(Boolean.parseBoolean(effectSplit[1]));
-            killEffect.setActive(Boolean.parseBoolean(effectSplit[2]));
-            killEffects.add(killEffect);
+        for(final String string : s.split(" ")) {
+            killEffects.add(plugin.getKillEffectManager().getKillEffectByName(string));
         }
         return killEffects;
+    }
+
+    private Set<WinEffect> getWinEffectsOfString(final String s) {
+        final Set<WinEffect> winEffects = new HashSet<>();
+        for(final String string : s.split(" ")) {
+            winEffects.add(plugin.getWinEffectManager().getWinEffectByName(string));
+        }
+        return winEffects;
     }
 
 }
