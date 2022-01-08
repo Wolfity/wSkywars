@@ -203,10 +203,12 @@ public class SkywarsPlayer {
     }
     // setting the current active killeffect to false, and after that, setting a new active effect
     public void setActiveKillEffect(final KillEffect newActiveEffect) {
+        killEffects.stream().filter(KillEffect::isUnlocked).filter(KillEffect::isActive).forEach(killEffect -> killEffect.setActive(false));
         newActiveEffect.setActive(true);
     }
 
     public void setActiveWinEffect(WinEffect newActiveWinEffect) {
+        winEffects.stream().filter(WinEffect::isUnlocked).filter(WinEffect::isActive).forEach(winEffect -> winEffect.setActive(false));
         newActiveWinEffect.setActive(true);
     }
 

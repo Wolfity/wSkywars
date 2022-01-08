@@ -99,6 +99,9 @@ public class SQLiteManager {
                 getKills(uuid),
                 getCoins(uuid), new Cage("defaultcage"));
 
+        swPlayer.setKillEffects(plugin.getKillEffectManager().getKillEffects());
+        swPlayer.setWinEffects(plugin.getWinEffectManager().getWinEffects());
+
         swPlayer.setActiveKillEffect(plugin.getKillEffectManager().getKillEffectByName(getActiveCosmetic(uuid, "activekilleffect")));
         swPlayer.setActiveWinEffect(plugin.getWinEffectManager().getWinEffectByName(getActiveCosmetic(uuid, "activewineffect")));
 
