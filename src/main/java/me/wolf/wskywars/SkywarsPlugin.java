@@ -5,17 +5,12 @@ import me.wolf.wskywars.arena.ArenaManager;
 import me.wolf.wskywars.cage.CageManager;
 import me.wolf.wskywars.chest.SkywarsChestManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
-import me.wolf.wskywars.cosmetics.CosmeticType;
-import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
+import me.wolf.wskywars.cosmetics.killeffect.KillEffectManager;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffectListener;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffectManager;
 import me.wolf.wskywars.files.FileManager;
 import me.wolf.wskywars.game.GameManager;
-import me.wolf.wskywars.cosmetics.killeffect.KillEffectManager;
-import me.wolf.wskywars.listeners.BlockBreak;
-import me.wolf.wskywars.listeners.BlockPlace;
-import me.wolf.wskywars.listeners.InventoryInteractions;
-import me.wolf.wskywars.listeners.PlayerQuitJoin;
+import me.wolf.wskywars.listeners.*;
 import me.wolf.wskywars.menu.MenuListener;
 import me.wolf.wskywars.player.PlayerManager;
 import me.wolf.wskywars.player.SkywarsPlayer;
@@ -66,9 +61,9 @@ public class SkywarsPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        for (final SkywarsPlayer skywarsPlayer : playerManager.getSkywarsPlayers().values()) {
-            this.sqLiteManager.saveData(skywarsPlayer.getUuid());
-            this.sqLiteManager.saveCosmeticData(skywarsPlayer.getUuid());
+        for (final SkywarsPlayer player : playerManager.getSkywarsPlayers().values()) {
+            sqLiteManager.saveData(player.getUuid());
+            sqLiteManager.saveCosmeticData(player.getUuid());
         }
         this.sqLiteManager.disconnect();
     }
@@ -100,7 +95,8 @@ public class SkywarsPlugin extends JavaPlugin {
                 new BlockPlace(this),
                 new InventoryInteractions(this),
                 new MenuListener(playerManager),
-                new WinEffectListener(this)
+                new WinEffectListener(this),
+                new GameListeners(this)
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 

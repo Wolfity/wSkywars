@@ -36,10 +36,10 @@ public class InventoryInteractions implements Listener {
 
         switch (event.getMaterial()) {
             case DIAMOND_SWORD:
-                new CosmeticMenu(player, CosmeticType.KILLEFFECT, plugin.getScoreboard());
+                new CosmeticMenu(player, CosmeticType.KILLEFFECT, plugin);
                 break;
             case BLAZE_POWDER:
-                new CosmeticMenu(player, CosmeticType.WINEFFECT, plugin.getScoreboard());
+                new CosmeticMenu(player, CosmeticType.WINEFFECT, plugin);
                 break;
             case GREEN_STAINED_GLASS:
                 break;

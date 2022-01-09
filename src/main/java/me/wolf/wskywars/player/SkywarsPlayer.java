@@ -1,7 +1,9 @@
 package me.wolf.wskywars.player;
 
+import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.cosmetics.Cosmetic;
+import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
 import me.wolf.wskywars.cosmetics.killeffect.types.DefaultKillEffect;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
@@ -16,51 +18,45 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 public class SkywarsPlayer {
 
     private final UUID uuid;
-    private int wins, kills, coins;
+    private int wins, kills, coins, tempWins, tempKills;
     private boolean isSpectator;
     private PlayerState playerState;
     private Cage cage;
-    private Set<KillEffect> killEffects;
-    private Set<WinEffect> winEffects;
+    private Set<Cosmetic> unlockedCosmetics;
+
 
     // creating a first time object
-    public SkywarsPlayer(final UUID uuid) {
+    public SkywarsPlayer(final UUID uuid, final SkywarsPlugin plugin) {
         this.uuid = uuid;
         this.wins = 0;
         this.kills = 0;
         this.coins = 0;
         this.isSpectator = false;
         this.playerState = PlayerState.IN_LOBBY;
-        this.killEffects = new HashSet<>();
-        this.winEffects = new HashSet<>();
+        this.unlockedCosmetics = new HashSet<>();
     }
 
-    public SkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins, final Cage cage) {
-        this.uuid = uuid;
-        this.coins = coins;
-        this.wins = wins;
-        this.kills = kills;
-        this.isSpectator = false;
-        this.playerState = PlayerState.IN_LOBBY;
-        this.cage = cage;
-    }
 
     public Cage getCage() {
         return cage;
     }
 
-    public Set<KillEffect> getKillEffects() {
-        return killEffects;
+    public Set<Cosmetic> getUnlockedCosmetics() {
+        return unlockedCosmetics;
     }
 
-    public void setKillEffects(Set<KillEffect> killEffects) {
-        this.killEffects = killEffects;
+    public void setUnlockedCosmetics(Set<Cosmetic> unlockedCosmetics) {
+        this.unlockedCosmetics = unlockedCosmetics;
     }
+
 
     public void setCage(Cage cage) {
         this.cage = cage;
@@ -192,40 +188,42 @@ public class SkywarsPlayer {
         return getLocation().getPitch();
     }
 
-    public void giveLobbyInventory() {
-        getInventory().setItem(3,ItemUtils.createItem(Material.DIAMOND_SWORD, "&eKill Effects"));
-        getInventory().setItem(4,ItemUtils.createItem(Material.BLAZE_POWDER, "&eWin Effects"));
-        getInventory().setItem(5,ItemUtils.createItem(Material.GREEN_STAINED_GLASS, "&eCages"));
-    }
-    // getting the active kill effect, if there is none, return the default effect
-    public KillEffect getActiveKillEffect() {
-        return killEffects.stream().filter(KillEffect::isActive).findFirst().orElse(new DefaultKillEffect());
-    }
-    // setting the current active killeffect to false, and after that, setting a new active effect
-    public void setActiveKillEffect(final KillEffect newActiveEffect) {
-        killEffects.stream().filter(KillEffect::isUnlocked).filter(KillEffect::isActive).forEach(killEffect -> killEffect.setActive(false));
-        newActiveEffect.setActive(true);
+    public String getDisplayName() {
+        return getBukkitPlayer().getDisplayName();
     }
 
-    public void setActiveWinEffect(WinEffect newActiveWinEffect) {
-        winEffects.stream().filter(WinEffect::isUnlocked).filter(WinEffect::isActive).forEach(winEffect -> winEffect.setActive(false));
-        newActiveWinEffect.setActive(true);
+    public void giveLobbyInventory() {
+        getInventory().setItem(3, ItemUtils.createItem(Material.DIAMOND_SWORD, "&eKill Effects"));
+        getInventory().setItem(4, ItemUtils.createItem(Material.BLAZE_POWDER, "&eWin Effects"));
+        getInventory().setItem(5, ItemUtils.createItem(Material.GREEN_STAINED_GLASS, "&eCages"));
     }
+
+    public KillEffect getActiveKillEffect() {
+        return (KillEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.KILLEFFECT).filter(Cosmetic::isActive).findFirst().orElse(new DefaultKillEffect());
+    }
+
+    public WinEffect getActiveWinEffect() {
+        return (WinEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT).filter(Cosmetic::isActive).findFirst().orElse(new DefaultWinEffect());
+    }
+
+    public void setActiveCosmetic(final Cosmetic cosmetic) {
+        switch (cosmetic.getCosmeticType()) {
+            case KILLEFFECT:
+                getActiveKillEffect().setActive(false);
+                cosmetic.setActive(true);
+                break;
+            case WINEFFECT:
+                getActiveWinEffect().setActive(false);
+                cosmetic.setActive(true);
+                break;
+        }
+    }
+
 
     public void unlockCosmetic(final Cosmetic cosmetic) {
-        cosmetic.setUnlocked(true);
+        this.unlockedCosmetics.add(cosmetic);
     }
 
-    public Set<WinEffect> getWinEffects() {
-        return winEffects;
-    }
-    public WinEffect getActiveWinEffect() {
-        return winEffects.stream().filter(WinEffect::isActive).findFirst().orElse(new DefaultWinEffect());
-    }
-
-    public void setWinEffects(Set<WinEffect> winEffects) {
-        this.winEffects = winEffects;
-    }
 
     @Override
     public boolean equals(Object o) {

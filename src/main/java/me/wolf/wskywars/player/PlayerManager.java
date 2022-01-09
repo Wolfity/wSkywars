@@ -1,12 +1,9 @@
 package me.wolf.wskywars.player;
 
-import me.wolf.wskywars.cage.Cage;
-import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
-import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
+import me.wolf.wskywars.SkywarsPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public class PlayerManager {
@@ -23,25 +20,13 @@ public class PlayerManager {
     }
 
     // creating a new first time skywars player
-    public void addSkywarsPlayer(final UUID uuid) {
-        this.skywarsPlayers.put(uuid, new SkywarsPlayer(uuid));
+    public void addSkywarsPlayer(final UUID uuid, final SkywarsPlugin plugin) {
+        this.skywarsPlayers.put(uuid, new SkywarsPlayer(uuid, plugin));
     }
 
     // remove a skywars player
     public void removeSkywarsPlayer(final UUID uuid) {
         this.skywarsPlayers.remove(uuid);
-    }
-
-    /**
-     * @param uuid:  The UUID of the player we are going to load in
-     * @param wins:  The amount of wins stored by the UUID
-     * @param kills: The amount of kills stored by the UUID
-     * @param coins: The amount of coins stored by the UUID
-     */
-    public SkywarsPlayer loadSkywarsPlayer(final UUID uuid, final int wins, final int kills, final int coins, final Cage cage) {
-        final SkywarsPlayer skywarsPlayer = new SkywarsPlayer(uuid, wins, kills, coins, cage);
-        this.skywarsPlayers.put(uuid, skywarsPlayer);
-        return skywarsPlayer;
     }
 
 

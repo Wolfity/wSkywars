@@ -1,58 +1,52 @@
 package me.wolf.wskywars.menu.types;
 
+import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.cosmetics.Cosmetic;
 import me.wolf.wskywars.cosmetics.CosmeticType;
-import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
-import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
 import me.wolf.wskywars.menu.SkywarsMenu;
 import me.wolf.wskywars.player.SkywarsPlayer;
-import me.wolf.wskywars.scoreboard.SkywarsScoreboard;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-
 public class CosmeticMenu extends SkywarsMenu {
-    public CosmeticMenu(SkywarsPlayer owner, CosmeticType cosmeticType, final SkywarsScoreboard scoreboard) {
+    public CosmeticMenu(SkywarsPlayer owner, CosmeticType cosmeticType, final SkywarsPlugin plugin) {
         super(18, cosmeticType.getDisplay(), owner);
-        final List<Cosmetic> sortedCosmetics = Stream.of(owner.getKillEffects(),
-                owner.getWinEffects()).flatMap(Collection::stream).sorted().collect(toList());
+
+
+        final List<Cosmetic> allCosmetic = Stream.of(plugin.getKillEffectManager().getKillEffects(),
+                plugin.getWinEffectManager().getWinEffects()).flatMap(Collection::stream).sorted().collect(Collectors.toList());
 
         switch (cosmeticType) {
             case KILLEFFECT:
-                sortedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.KILLEFFECT).forEach(killEffect -> {
-                    if (killEffect.isUnlocked() || killEffect.getName().equalsIgnoreCase("default")) {
-                        addItem(killEffect.getIcon(), player -> {
-                            owner.setActiveKillEffect((KillEffect) killEffect);
-                            owner.sendMessage("&aSuccessfully selected the killeffect &e" + killEffect.getName());
-                            scoreboard.lobbyScoreboard(owner);
+                allCosmetic.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.KILLEFFECT).forEach(cosmetic -> {
+                    if (owner.getUnlockedCosmetics().contains(cosmetic) || cosmetic.getName().equalsIgnoreCase("default")) {
+                        addItem(cosmetic.getIcon(), player -> {
+                            owner.setActiveCosmetic(cosmetic);
+                            owner.sendMessage("&aSuccessfully set " + cosmetic.getName() + " to active!");
+                            plugin.getScoreboard().lobbyScoreboard(owner);
                         });
                     } else
-                        addItem(killEffect.getLockedIcon(), player -> new PurchaseMenu(owner, killEffect, scoreboard));
+                        addItem(cosmetic.getLockedIcon(), player -> new PurchaseMenu(owner, cosmetic, plugin.getScoreboard()));
                 });
-
                 break;
             case WINEFFECT:
-                sortedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT).forEach(winEffect -> {
-                    if (winEffect.isUnlocked() || winEffect.getName().equalsIgnoreCase("default")) {
-                        addItem(winEffect.getIcon(), player -> {
-                            owner.setActiveWinEffect((WinEffect) winEffect);
-                            owner.sendMessage("&aSuccessfully selected the win effect &e" + winEffect.getName());
-                            scoreboard.lobbyScoreboard(owner);
+                allCosmetic.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT).forEach(cosmetic -> {
+                    if (owner.getUnlockedCosmetics().contains(cosmetic) || cosmetic.getName().equalsIgnoreCase("default")) {
+                        addItem(cosmetic.getIcon(), player -> {
+                            owner.setActiveCosmetic(cosmetic);
+                            owner.sendMessage("&aSuccessfully set " + cosmetic.getName() + " to active!");
+                            plugin.getScoreboard().lobbyScoreboard(owner);
                         });
                     } else
-                        addItem(winEffect.getLockedIcon(), player -> new PurchaseMenu(owner, winEffect, scoreboard));
+                        addItem(cosmetic.getLockedIcon(), player -> new PurchaseMenu(owner, cosmetic, plugin.getScoreboard()));
                 });
                 break;
-            case CAGE:
-                break;
-
         }
+
+
         openSkywarsMenu(owner);
     }
 }
