@@ -14,27 +14,27 @@ public class SkywarsChest {
         this.itemsPerChest = itemsPerChest;
     }
 
-    public void setItemsPerChest(int itemsPerChest) {
-        this.itemsPerChest = itemsPerChest;
-    }
-
     public int getItemsPerChest() {
         return itemsPerChest;
     }
 
-    public void setChestType(ChestType chestType) {
-        this.chestType = chestType;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setItemsPerChest(int itemsPerChest) {
+        this.itemsPerChest = itemsPerChest;
     }
 
     public ChestType getChestType() {
         return chestType;
     }
 
+    public void setChestType(ChestType chestType) {
+        this.chestType = chestType;
+    }
+
     public Location getLocation() {
         return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

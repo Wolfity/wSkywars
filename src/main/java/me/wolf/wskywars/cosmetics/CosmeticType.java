@@ -7,6 +7,7 @@ public enum CosmeticType {
     CAGE("&bCages");
 
     private final String display;
+
     CosmeticType(final String display) {
         this.display = display;
     }

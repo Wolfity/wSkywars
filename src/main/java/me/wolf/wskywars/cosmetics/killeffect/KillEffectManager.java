@@ -2,7 +2,6 @@ package me.wolf.wskywars.cosmetics.killeffect;
 
 import me.wolf.wskywars.cosmetics.killeffect.types.*;
 import me.wolf.wskywars.files.YamlConfig;
-import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

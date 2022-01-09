@@ -13,7 +13,7 @@ public class PurchaseMenu extends SkywarsMenu {
         super(9, "&a&lPurchase Cosmetic", owner);
 
         setItem(3, ItemUtils.createItem(Material.GREEN_STAINED_GLASS_PANE, "&a&lPurchase"), player -> {
-            if(owner.getCoins() > cosmetic.getPrice()) {
+            if (owner.getCoins() > cosmetic.getPrice()) {
                 processTransaction(owner, cosmetic, scoreboard);
                 player.closeInventory();
             } else owner.sendMessage("&cNot Enough Coins!");

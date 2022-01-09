@@ -110,7 +110,7 @@ public class GameManager {
      * @param game   the game someone was killed in
      * @param killer the entity that killed the player
      * @param killed the killed player
-     * Method for handling the kill of a player
+     *               Method for handling the kill of a player
      */
 
     public void handleGameKill(final Game game, Entity killer, final SkywarsPlayer killed) {

@@ -10,8 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.UUID;
-
 public class PlayerQuitJoin implements Listener {
 
     private final SkywarsPlugin plugin;
@@ -28,7 +26,6 @@ public class PlayerQuitJoin implements Listener {
             plugin.getSqLiteManager().createCosmeticData(player.getUniqueId());
             // give the player ALL cosmetics (locked)
         });
-
 
 
         // won't be null, since the object is created on join

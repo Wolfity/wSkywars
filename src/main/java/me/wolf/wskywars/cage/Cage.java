@@ -18,12 +18,12 @@ public class Cage {
         return editSession;
     }
 
-    public File getSchemFile() {
-        return schemFile;
-    }
-
     public void setEditSession(EditSession editSession) {
         this.editSession = editSession;
+    }
+
+    public File getSchemFile() {
+        return schemFile;
     }
 
     public void setSchemFile(File schemFile) {

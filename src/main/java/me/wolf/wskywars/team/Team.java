@@ -41,6 +41,7 @@ public class Team implements Comparable<Team> {
     public void sendMessage(final String msg) {
         teamMembers.forEach(player -> player.sendMessage(msg));
     }
+
     public void sendCenteredMessage(final String[] msg) {
         teamMembers.forEach(player -> player.sendCenteredMessage(msg));
     }

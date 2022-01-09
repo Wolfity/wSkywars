@@ -22,11 +22,11 @@ public class IceWalkerWinEffect extends WinEffect {
     @Override
     public void playEffect(Arena arena, SkywarsPlayer winner, SkywarsPlugin plugin) {
         walkerMap.add(winner);
-        winner.getBukkitPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, getDuration() * 20,2, false, false));
+        winner.getBukkitPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, getDuration() * 20, 2, false, false));
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(getDuration() > 0) {
+                if (getDuration() > 0) {
                     decrementDuration();
                 } else {
                     this.cancel();

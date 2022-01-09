@@ -1,7 +1,5 @@
 package me.wolf.wskywars.player;
 
-import me.wolf.wskywars.SkywarsPlugin;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,8 +18,8 @@ public class PlayerManager {
     }
 
     // creating a new first time skywars player
-    public void addSkywarsPlayer(final UUID uuid, final SkywarsPlugin plugin) {
-        this.skywarsPlayers.put(uuid, new SkywarsPlayer(uuid, plugin));
+    public void addSkywarsPlayer(final UUID uuid) {
+        this.skywarsPlayers.put(uuid, new SkywarsPlayer(uuid));
     }
 
     // remove a skywars player

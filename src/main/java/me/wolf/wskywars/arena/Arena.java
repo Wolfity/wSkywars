@@ -16,8 +16,8 @@ public class Arena {
 
     private final String name;
     private final Set<Team> teams;
-    private  List<Location> spawnLocations;
-    private  Set<SkywarsChest> chests ;
+    private List<Location> spawnLocations;
+    private Set<SkywarsChest> chests;
     private int teamSize, cageCountdown, chestRefill, gameTimer, minTeams, maxTeams;
     private FileConfiguration arenaConfig;
     private File arenaConfigFile;
@@ -86,10 +86,6 @@ public class Arena {
         return chestRefill;
     }
 
-    public void setSpawnLocations(List<Location> spawnLocations) {
-        this.spawnLocations = spawnLocations;
-    }
-
     public void setChestRefill(int chestRefill) {
         this.chestRefill = chestRefill;
     }
@@ -114,15 +110,21 @@ public class Arena {
         return spawnLocations;
     }
 
+    public void setSpawnLocations(List<Location> spawnLocations) {
+        this.spawnLocations = spawnLocations;
+    }
+
     public Set<SkywarsChest> getChests() {
         return chests;
+    }
+
+    public void setChests(Set<SkywarsChest> chests) {
+        this.chests = chests;
     }
 
     public void addSpawnLocation(final Location location) {
         this.spawnLocations.add(location);
     }
-
-
 
     public Location getCenter() {
         return center;
@@ -150,10 +152,6 @@ public class Arena {
 
     public void decrementGameTimer() {
         this.gameTimer--;
-    }
-
-    public void setChests(Set<SkywarsChest> chests) {
-        this.chests = chests;
     }
 
     /**

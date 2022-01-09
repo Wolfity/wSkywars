@@ -1,6 +1,5 @@
 package me.wolf.wskywars.player;
 
-import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.cosmetics.Cosmetic;
 import me.wolf.wskywars.cosmetics.CosmeticType;
@@ -34,7 +33,7 @@ public class SkywarsPlayer {
 
 
     // creating a first time object
-    public SkywarsPlayer(final UUID uuid, final SkywarsPlugin plugin) {
+    public SkywarsPlayer(final UUID uuid) {
         this.uuid = uuid;
         this.wins = 0;
         this.kills = 0;
@@ -49,17 +48,16 @@ public class SkywarsPlayer {
         return cage;
     }
 
+    public void setCage(Cage cage) {
+        this.cage = cage;
+    }
+
     public Set<Cosmetic> getUnlockedCosmetics() {
         return unlockedCosmetics;
     }
 
     public void setUnlockedCosmetics(Set<Cosmetic> unlockedCosmetics) {
         this.unlockedCosmetics = unlockedCosmetics;
-    }
-
-
-    public void setCage(Cage cage) {
-        this.cage = cage;
     }
 
     public UUID getUuid() {

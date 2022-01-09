@@ -10,6 +10,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 public class BlockBreak implements Listener {
 
     private final SkywarsPlugin plugin;
+
     public BlockBreak(final SkywarsPlugin plugin) {
         this.plugin = plugin;
     }

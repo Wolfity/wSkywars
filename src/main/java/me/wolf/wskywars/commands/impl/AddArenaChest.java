@@ -28,7 +28,7 @@ public class AddArenaChest extends SubCommand {
 
     @Override
     protected void executeCommand(SkywarsPlayer player, String[] args, SkywarsPlugin plugin) {
-        if(!isAdmin(player)) {
+        if (!isAdmin(player)) {
             player.sendMessage("&cNo Permission!");
             return;
         }
@@ -39,7 +39,7 @@ public class AddArenaChest extends SubCommand {
         }
 
         final Arena arena = plugin.getArenaManager().getArenaByName(args[1]);
-        if(arena == null) {
+        if (arena == null) {
             player.sendMessage("&cThis arena does not exist!");
             return;
         }
@@ -49,7 +49,7 @@ public class AddArenaChest extends SubCommand {
             arena.getArenaConfig().set("chests." + arena.getChests().size() + ".location", Utils.locToString(player.getLocation()));
             arena.getArenaConfig().set("chests." + arena.getChests().size() + ".type", chestType.toString());
             arena.getArenaConfig().set("chests." + arena.getChests().size() + ".items", 5);
-            arena.getChests().add(new SkywarsChest(player.getLocation(), chestType,5));
+            arena.getChests().add(new SkywarsChest(player.getLocation(), chestType, 5));
 
             arena.getArenaConfig().save(arena.getArenaConfigFile());
 

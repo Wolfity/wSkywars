@@ -33,7 +33,6 @@ public class SkywarsScoreboard {
         objective.getScore(Utils.colorize("&7Header :) ")).setScore(7);
 
 
-
         final Team wins = scoreboard.registerNewTeam("wins");
         wins.addEntry(Utils.colorize("&8Wins: "));
         wins.setPrefix("");
@@ -75,7 +74,7 @@ public class SkywarsScoreboard {
     }
 
     public void gameScoreboard(final SkywarsPlayer player, final Game game) {
-        if(player == null) return; // player left mid game for example
+        if (player == null) return; // player left mid game for example
         if (game == null) return;
 
         final String name = game.getArena().getName();

@@ -1,10 +1,8 @@
 package me.wolf.wskywars.menu;
 
-import me.wolf.wskywars.chest.SkywarsChest;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -53,10 +51,11 @@ public class SkywarsMenu {
     public void addItem(final ItemStack stack) {
         skywarsMenu.setItem(skywarsMenu.firstEmpty(), stack);
     }
+
     public void addItem(final ItemStack stack, final ClickAction action) {
         final int nextSlot = skywarsMenu.firstEmpty();
         skywarsMenu.setItem(nextSlot, stack);
-        if(action != null) {
+        if (action != null) {
             actions.put(nextSlot, action);
         }
     }
@@ -73,7 +72,6 @@ public class SkywarsMenu {
     public Map<Integer, ClickAction> getActions() {
         return actions;
     }
-
 
 
     public void setItem(final int slot, final ItemStack stack) {
