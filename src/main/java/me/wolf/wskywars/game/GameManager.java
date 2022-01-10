@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 public class GameManager {
 
@@ -39,11 +40,9 @@ public class GameManager {
             case COUNTDOWN:
                 arena.setArenaState(ArenaState.IN_COUNTDOWN);
                 arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.setPlayerState(PlayerState.IN_WAITING_ROOM)));
-                startLobbyCountdown(game);
                 plugin.getSkywarsChestManager().fillChests(game);
                 break;
             case INGAME:
-
                 chestRefillTimer(game);
                 startGameTimer(game);
                 arena.setArenaState(ArenaState.IN_GAME);
@@ -53,6 +52,7 @@ public class GameManager {
                 arena.setArenaState(ArenaState.IN_GAME);
                 arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.setPlayerState(PlayerState.IN_GAME)));
                 sendEndGameMessage(arena);
+                getWinningTeam(arena).getTeamMembers().forEach(SkywarsPlayer::addWin);
                 Bukkit.getScheduler().runTaskLater(plugin, () -> cleanUp(game), 200L);
                 break;
 
@@ -69,16 +69,15 @@ public class GameManager {
         final Game game = getGameByArena(arena);
 
         player.sendMessage("&aSuccessfully left this game!");
-        arena.getTeams().forEach(team -> {
-            team.getTeamMembers().remove(player);
-            if (team.getTeamMembers().size() == 0) arena.getTeams().remove(team); // full team eliminated
-        }); // removing the player from his team
+
 
         player.setPlayerState(PlayerState.IN_LOBBY);
         player.setSpectator(false);
         player.clearInventory();
         player.clearEffects();
         player.resetHunger();
+        player.getBukkitPlayer().setGameMode(GameMode.SURVIVAL);
+
 
         player.teleport( // teleport to the skywars spawn
                 new Location(Bukkit.getWorld(Objects.requireNonNull(plugin.getConfig().getString("spawn.world"))),
@@ -89,7 +88,10 @@ public class GameManager {
                         (float) plugin.getConfig().getDouble("spawn.yaw")));
 
         if (!cleanUp) {
-            arena.getTeams().clear();
+            arena.getTeams().forEach(team -> {
+                team.getTeamMembers().remove(player);
+                if (team.getTeamMembers().size() == 0) arena.getTeams().remove(team); // full team eliminated
+            }); // removing the player from his team
         }
 
         if (arena.getTeams().size() <= 1) { // if there are either 1 or 0 teams left, depending on the game state, end the game, or cancel the cooldown
@@ -104,6 +106,8 @@ public class GameManager {
                 arena.setCageCountdown(arena.getArenaConfig().getInt("cage-countdown"));
             }
         }
+        player.setUpPlayer();
+        plugin.getScoreboard().lobbyScoreboard(player);
     }
 
     /**
@@ -113,33 +117,31 @@ public class GameManager {
      *               Method for handling the kill of a player
      */
 
-    public void handleGameKill(final Game game, Entity killer, final SkywarsPlayer killed) {
+    public void handleGameKill(final Game game, UUID killer, final SkywarsPlayer killed) {
         final Arena arena = game.getArena();
-        final Team team = arena.getTeams().stream().filter(arenaTeam -> arenaTeam.getTeamMembers().contains(killed)).findFirst().orElse(null);
-        if (team == null) return;
 
-        // the last player in the team is dead
-        if (team.getTeamMembers().stream().filter(SkywarsPlayer::isSpectator).count() == arena.getTeamSize()) {
-            arena.getTeams().remove(team); // entire team eliminated
-        }
 
         // set the user to spectator mode
         killed.setSpectator(true);
         killed.getBukkitPlayer().setGameMode(GameMode.SPECTATOR);
+        final int teamCount = (int) arena.getTeams().stream().filter(team -> team.getTeamMembers().stream().filter(SkywarsPlayer::isSpectator).count() == arena.getTeamSize()).count();
+
 
         // if it's a player, make a SkywarsPlayer object
-        if (killer instanceof Player) {
-            killer = (Entity) plugin.getPlayerManager().getSkywarsPlayer(killer.getUniqueId());
-            ((SkywarsPlayer) killer).setCoins(((SkywarsPlayer) killer).getCoins() + 50);
+        if (Bukkit.getEntity(killer) instanceof Player) {
+            final SkywarsPlayer humanKiller = plugin.getPlayerManager().getSkywarsPlayer(killer);
+            humanKiller.setCoins(humanKiller.getCoins() + 50);
+            humanKiller.addTempKill(); // temp kill (game only)
+            humanKiller.addKill();  // permanent DB kill
         }
 
         // send the alert to the arena
-        final Entity finalKiller = killer;
+        final Entity finalKiller = Bukkit.getEntity(killer);
         arena.getTeams().forEach(aliveTeam -> aliveTeam.sendMessage("&6[!] &6" + killed.getDisplayName() + " &ewas killed by " + finalKiller.getName()));
 
 
         if (arena.getArenaState() == ArenaState.IN_GAME) {
-            if (arena.getTeams().size() == 0) {
+            if (teamCount == 1) {
                 setGameState(game, GameState.END);
             }
         }
@@ -204,7 +206,6 @@ public class GameManager {
         final Arena arena = game.getArena();
         // teleport to the next spawn
 
-
         for (int i = 0; i < arena.getTeams().size(); i++) {
             player.teleport(arena.getSpawnLocations().get(i));
             try {
@@ -213,8 +214,11 @@ public class GameManager {
                 e.printStackTrace();
             }
         }
-        if (arena.getTeams().size() >= arena.getMinTeams()) {
+        player.clearInventory();
+        player.setUpPlayer();
+        if (arena.getTeams().size() == arena.getMinTeams()) {
             setGameState(game, GameState.COUNTDOWN);
+            startLobbyCountdown(game);
         }
     }
 
@@ -223,12 +227,15 @@ public class GameManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (arena.getGameTimer() > 0) {
-                    arena.decrementGameTimer();
-                } else {
-                    this.cancel();
-                    arena.setGameTimer(arena.getArenaConfig().getInt("game-timer"));
-                    setGameState(game, GameState.END);
+                if (game.getGameState() == GameState.INGAME) {
+                    if (arena.getGameTimer() > 0) {
+                        arena.decrementGameTimer();
+                    } else {
+                        this.cancel();
+                        arena.setGameTimer(arena.getArenaConfig().getInt("game-timer"));
+                        setGameState(game, GameState.END);
+                        System.out.println("game countdown " + arena.getGameTimer());
+                    }
                 }
             }
         }.runTaskTimer(plugin, 0L, 20L);
@@ -296,14 +303,19 @@ public class GameManager {
 
     private void cleanUp(final Game game) {
         final Arena arena = game.getArena();
-        arena.setArenaState(ArenaState.RECRUITING);
 
         arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> leaveGame(skywarsPlayer, true)));
-        try {
-            plugin.getArenaManager().pasteMap(arena.getCenter(), arena.getName());
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
+        arena.getTeams().clear();
+        arena.setGameTimer(arena.getArenaConfig().getInt("game-timer"));
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    try {
+                        plugin.getArenaManager().pasteMap(arena.getCenter(), arena.getName());
+                        arena.setArenaState(ArenaState.RECRUITING);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                },
+                20L);
 
         games.remove(game);
     }
@@ -333,16 +345,6 @@ public class GameManager {
         return i;
     }
 
-    private Team getWinners(final Arena arena) {
-        for (final Team team : arena.getTeams()) {
-            for (final SkywarsPlayer player : team.getTeamMembers()) {
-                if (!player.isSpectator()) {
-                    return team;
-                }
-            }
-        }
-        return null;
-    }
 
     private String formatWinners(final Team winningTeam) {
         final StringBuilder sb = new StringBuilder();
@@ -357,7 +359,7 @@ public class GameManager {
                     "",
                     "&e&lThe Game Has Ended!",
                     "&aThe winners: ",
-                    formatWinners(getWinners(arena)),
+                    formatWinners(getWinningTeam(arena)),
                     "",
                     "&7---------------------------------"
             });
@@ -365,4 +367,14 @@ public class GameManager {
         }));
     }
 
+    private Team getWinningTeam(final Arena arena) {
+        return arena.getTeams()
+                .stream()
+                .filter(team ->
+                        team.getTeamMembers()
+                                .stream()
+                                .filter(SkywarsPlayer::isSpectator)
+                                .count() != arena.getTeamSize()).findFirst().orElse(null);
+    }
 }
+

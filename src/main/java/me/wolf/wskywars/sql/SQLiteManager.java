@@ -3,19 +3,15 @@ package me.wolf.wskywars.sql;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.wolf.wskywars.SkywarsPlugin;
+import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.cosmetics.Cosmetic;
 import me.wolf.wskywars.cosmetics.CosmeticType;
-import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
-import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.sql.*;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -136,8 +132,8 @@ public class SQLiteManager {
      */
     public void saveCosmeticData(final UUID uuid) {
         final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(uuid);
-        this.setUnlockedCosmetics(uuid,"wineffects", getCosmeticSetToString(skywarsPlayer.getUnlockedCosmetics(), CosmeticType.WINEFFECT));
-        this.setUnlockedCosmetics(uuid,"killeffects", getCosmeticSetToString(skywarsPlayer.getUnlockedCosmetics(), CosmeticType.KILLEFFECT));
+        this.setUnlockedCosmetics(uuid, "wineffects", getCosmeticSetToString(skywarsPlayer.getUnlockedCosmetics(), CosmeticType.WINEFFECT));
+        this.setUnlockedCosmetics(uuid, "killeffects", getCosmeticSetToString(skywarsPlayer.getUnlockedCosmetics(), CosmeticType.KILLEFFECT));
     }
 
     /**
@@ -157,18 +153,20 @@ public class SQLiteManager {
         skywarsPlayer.setCoins(this.getData(uuid, DataType.COINS));
         skywarsPlayer.setWins(this.getData(uuid, DataType.WINS));
         skywarsPlayer.setKills(this.getData(uuid, DataType.KILLS));
+
+        skywarsPlayer.setCage(new Cage("defaultcage"));
     }
 
     /**
      * @param uuid loading the UUID's unlocked cosmetics
      */
     private void loadCosmeticData(final UUID uuid) {
-        this.setUnlockedCosmetics(uuid,"wineffects", this.getUnlockedCosmetics(uuid, "wineffects"));
-        this.setUnlockedCosmetics(uuid,"killeffects", this.getUnlockedCosmetics(uuid, "killeffects"));
+        this.setUnlockedCosmetics(uuid, "wineffects", this.getUnlockedCosmetics(uuid, "wineffects"));
+        this.setUnlockedCosmetics(uuid, "killeffects", this.getUnlockedCosmetics(uuid, "killeffects"));
         final SkywarsPlayer player = plugin.getPlayerManager().getSkywarsPlayer(uuid);
 
-        player.setUnlockedCosmetics(Stream.of(getUnlockedKillEffects(getUnlockedCosmetics(uuid, "killeffects")),
-                        getUnlockedWinEffects(getUnlockedCosmetics(uuid, "wineffects")))
+        player.setUnlockedCosmetics(Stream.of(getUnlockedCosmetic(CosmeticType.KILLEFFECT, getUnlockedCosmetics(uuid, "killeffects")),
+                        getUnlockedCosmetic(CosmeticType.WINEFFECT, getUnlockedCosmetics(uuid, "wineffects")))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet()));
     }
@@ -339,7 +337,7 @@ public class SQLiteManager {
 
     /**
      * @param cosmetics the set if cosmetics we are converting to a String
-     * @param type the type of cosmetic we are converting (KILLEFFECT, WINEFFECT, CAGE)
+     * @param type      the type of cosmetic we are converting (KILLEFFECT, WINEFFECT, CAGE)
      * @return a String of all cosmetics as the passed in set
      */
     private <T extends Cosmetic> String getCosmeticSetToString(final Set<T> cosmetics, final CosmeticType type) {
@@ -350,27 +348,22 @@ public class SQLiteManager {
     }
 
     /**
-     * @param killEffects the String of all of the player's unlocked kill effects
-     * @return a Set of all kill effects unlocked by the player
+     * @param cosmetic the cosmetic type we are getting the unlocked of
+     * @param data the data String
+     * @return a Set of the requested cosmetic
      */
-    private Set<KillEffect> getUnlockedKillEffects(final String killEffects) {
-        final Set<KillEffect> effects = new HashSet<>();
-        for (final String split : killEffects.split(" ")) {
-            effects.add(plugin.getKillEffectManager().getKillEffectByName(split));
-        }
-        return effects;
-    }
+    private Set<Cosmetic> getUnlockedCosmetic(final CosmeticType cosmetic, final String data) {
+        final Set<Cosmetic> cosmetics = new HashSet<>();
 
-    /**
-     * @param winEffects the string of all  the player's unlocked win effects
-     * @return a Set of all the player's win effects
-     */
-    private Set<WinEffect> getUnlockedWinEffects(final String winEffects) {
-        final Set<WinEffect> effects = new HashSet<>();
-        for (final String split : winEffects.split(" ")) {
-            effects.add(plugin.getWinEffectManager().getWinEffectByName(split));
+        switch (cosmetic) {
+            case KILLEFFECT:
+                Arrays.stream(data.split(" ")).forEach(entry -> cosmetics.add(plugin.getKillEffectManager().getKillEffectByName(entry)));
+                break;
+            case WINEFFECT:
+                Arrays.stream(data.split(" ")).forEach(entry -> cosmetics.add(plugin.getWinEffectManager().getWinEffectByName(entry)));
+                break;
         }
-        return effects;
+        return cosmetics;
     }
 
 }

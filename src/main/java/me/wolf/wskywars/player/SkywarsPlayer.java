@@ -25,7 +25,7 @@ import java.util.UUID;
 public class SkywarsPlayer {
 
     private final UUID uuid;
-    private int wins, kills, coins, tempWins, tempKills;
+    private int wins, kills, coins, tempKills;
     private boolean isSpectator;
     private PlayerState playerState;
     private Cage cage;
@@ -160,6 +160,22 @@ public class SkywarsPlayer {
         for (PotionEffect effect : getBukkitPlayer().getActivePotionEffects()) {
             getBukkitPlayer().removePotionEffect(effect.getType());
         }
+    }
+
+    public void addTempKill() {
+        this.tempKills++;
+    }
+
+    public int getTempKills() {
+        return tempKills;
+    }
+
+    public void addKill() {
+        this.kills++;
+    }
+
+    public void addWin() {
+        this.wins++;
     }
 
     public World getWorld() {

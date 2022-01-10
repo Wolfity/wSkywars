@@ -33,7 +33,7 @@ public class GameListeners implements Listener {
                 plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId()).getActiveKillEffect().playKillEffect(killed);
             }
 
-            plugin.getGameManager().handleGameKill(game, event.getDamager(), killed);
+            plugin.getGameManager().handleGameKill(game, event.getDamager().getUniqueId(), killed);
             // drop the killed player's contents
             for (final ItemStack is : killed.getInventory()) {
                 if (is == null) continue;
@@ -42,6 +42,8 @@ public class GameListeners implements Listener {
             // clear the killed player's inventory
             killed.getInventory().clear();
 
+
+            event.setCancelled(true);
         }
 
     }

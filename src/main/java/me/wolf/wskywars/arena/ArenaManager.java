@@ -142,6 +142,9 @@ public class ArenaManager {
         return null;
     }
 
+    /**
+     * @param arenaName delete the arena matching the arena name
+     */
     public void deleteArena(final String arenaName) {
         final Arena arena = getArenaByName(arenaName);
         arena.getArenaConfigFile().delete();
@@ -154,7 +157,6 @@ public class ArenaManager {
             ClipboardFormat format = ClipboardFormats.findByFile(schem);
             try (ClipboardReader reader = format.getReader(new FileInputStream(schem))) {
                 Clipboard clipboard = reader.read();
-
                 try (EditSession editSession = WorldEdit.getInstance().newEditSession(new BukkitWorld(mid.getWorld()))) {
                     final Operation operation = new ClipboardHolder(clipboard)
                             .createPaste(editSession)

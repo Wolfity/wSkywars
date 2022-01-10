@@ -113,7 +113,7 @@ public class SkywarsScoreboard {
         final Team kills = scoreboard.registerNewTeam("kills");
         kills.addEntry(Utils.colorize("&3Kills: "));
         kills.setPrefix("");
-        kills.setSuffix(Utils.colorize("&2" + player.getKills()));
+        kills.setSuffix(Utils.colorize("&2" + player.getTempKills()));
         objective.getScore(Utils.colorize("&3Kills: ")).setScore(5);
 
         player.getBukkitPlayer().setScoreboard(scoreboard);

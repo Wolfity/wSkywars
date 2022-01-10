@@ -49,13 +49,14 @@ public class SkywarsChestManager {
      *             gets called in the beginning of a game
      */
     public void fillChests(final Game game) {
-
         final Arena arena = game.getArena();
         arena.getChests().forEach(skywarsChest -> {
             skywarsChest.getLocation().getBlock().setType(Material.CHEST);
             final Chest chest = (Chest) skywarsChest.getLocation().getBlock().getState();
+            if(!hasEnoughAvailableSlots(chest.getInventory(), skywarsChest.getItemsPerChest())) return;
 
             for (int i = 0; i < skywarsChest.getItemsPerChest(); i++) {
+                System.out.println("filled a chest");
                 chest.getInventory().setItem(getRandomSlot(chest.getInventory()), getRandomItem(skywarsChest.getChestType()).getItem());
             }
 
@@ -82,5 +83,20 @@ public class SkywarsChestManager {
             randomSlot = new Random().nextInt(inventory.getSize());
         }
         return randomSlot;
+    }
+
+    /**
+     * @param inventory the chest's inventory
+     * @param amt       the amount of free slots we are looking for
+     * @return true if there are more than or equals of the amount of free slots
+     */
+    private boolean hasEnoughAvailableSlots(final Inventory inventory, final int amt) {
+        int i = 0;
+        for (final ItemStack item : inventory.getContents()) {
+            if (item == null) {
+                i++;
+            }
+        }
+        return i >= amt;
     }
 }
