@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
@@ -107,7 +108,9 @@ public class GameManager {
             }
         }
         player.setUpPlayer();
+        player.resetTempKills();
         plugin.getScoreboard().lobbyScoreboard(player);
+
     }
 
     /**
@@ -119,7 +122,6 @@ public class GameManager {
 
     public void handleGameKill(final Game game, UUID killer, final SkywarsPlayer killed) {
         final Arena arena = game.getArena();
-
 
         // set the user to spectator mode
         killed.setSpectator(true);
@@ -142,11 +144,36 @@ public class GameManager {
 
         if (arena.getArenaState() == ArenaState.IN_GAME) {
             if (teamCount == 1) {
+                getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> {
+                    System.out.println(skywarsPlayer.getActiveWinEffect().getName());
+                    skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin);
+                });
+                getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin));
                 setGameState(game, GameState.END);
             }
         }
+    }
 
+    public void handleGameKill(final Game game, final SkywarsPlayer killed, EntityDamageEvent.DamageCause damageCause) {
+        final Arena arena = game.getArena();
 
+        // set the user to spectator mode
+        killed.setSpectator(true);
+        killed.getBukkitPlayer().setGameMode(GameMode.SPECTATOR);
+        final int teamCount = (int) arena.getTeams().stream().filter(team -> team.getTeamMembers().stream().filter(SkywarsPlayer::isSpectator).count() == arena.getTeamSize()).count();
+
+        arena.getTeams().forEach(aliveTeam -> aliveTeam.sendMessage("&6[!] &6" + killed.getDisplayName() + " &ewas killed by " + damageCause.name()));
+
+        if (arena.getArenaState() == ArenaState.IN_GAME) {
+            if (teamCount == 1) {
+                getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> {
+                    System.out.println(skywarsPlayer.getActiveWinEffect().getName());
+                    skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin);
+                });
+                getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin));
+                setGameState(game, GameState.END);
+            }
+        }
     }
 
     public void joinGame(final SkywarsPlayer player) {
@@ -304,7 +331,10 @@ public class GameManager {
     private void cleanUp(final Game game) {
         final Arena arena = game.getArena();
 
-        arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> leaveGame(skywarsPlayer, true)));
+        arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> {
+            leaveGame(skywarsPlayer, true);
+            skywarsPlayer.resetTempKills();
+        }));
         arena.getTeams().clear();
         arena.setGameTimer(arena.getArenaConfig().getInt("game-timer"));
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -348,7 +378,7 @@ public class GameManager {
 
     private String formatWinners(final Team winningTeam) {
         final StringBuilder sb = new StringBuilder();
-        winningTeam.getTeamMembers().forEach(skywarsPlayer -> sb.append(skywarsPlayer.getName()).append(" - ").append(skywarsPlayer.getKills()).append("\n"));
+        winningTeam.getTeamMembers().forEach(skywarsPlayer -> sb.append(skywarsPlayer.getName()).append(" - ").append(skywarsPlayer.getTempKills()).append("\n"));
         return sb.toString();
     }
 

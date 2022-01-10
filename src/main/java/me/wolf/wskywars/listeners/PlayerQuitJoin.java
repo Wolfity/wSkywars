@@ -24,7 +24,6 @@ public class PlayerQuitJoin implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             plugin.getSqLiteManager().createPlayerData(player.getUniqueId(), player.getName());
             plugin.getSqLiteManager().createCosmeticData(player.getUniqueId());
-            // give the player ALL cosmetics (locked)
         });
 
 
@@ -33,8 +32,9 @@ public class PlayerQuitJoin implements Listener {
             final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(player.getUniqueId());
             plugin.getScoreboard().lobbyScoreboard(skywarsPlayer);
             skywarsPlayer.giveLobbyInventory();
-
-        }, 10L);
+            System.out.println("Player onjoin actifve " + skywarsPlayer.getActiveWinEffect().getName());
+            System.out.println("Player onjoin actifve " + skywarsPlayer.getActiveKillEffect().getName());
+        }, 5L);
 
     }
 

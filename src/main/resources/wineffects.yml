@@ -11,7 +11,7 @@ win-effects:
     price: 150
   icewalker:
     enabled: true
-    icon-material: FROSTED_ICE
+    icon-material: PACKED_ICE
     icon-name: "&bIce Walker"
     price: 500
   speedy:

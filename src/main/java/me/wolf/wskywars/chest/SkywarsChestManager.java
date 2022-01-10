@@ -56,7 +56,6 @@ public class SkywarsChestManager {
             if(!hasEnoughAvailableSlots(chest.getInventory(), skywarsChest.getItemsPerChest())) return;
 
             for (int i = 0; i < skywarsChest.getItemsPerChest(); i++) {
-                System.out.println("filled a chest");
                 chest.getInventory().setItem(getRandomSlot(chest.getInventory()), getRandomItem(skywarsChest.getChestType()).getItem());
             }
 

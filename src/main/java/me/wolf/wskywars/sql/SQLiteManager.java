@@ -291,6 +291,7 @@ public class SQLiteManager {
 
             ps.setString(1, uuid.toString());
             final ResultSet resultSet = ps.executeQuery();
+            System.out.println("ACTIVEEE type " + type + " HERE IS " + resultSet.getString(type));
             return resultSet.getString(type);
         } catch (final SQLException e) {
             e.printStackTrace();
@@ -332,7 +333,7 @@ public class SQLiteManager {
         } catch (final SQLException e) {
             e.printStackTrace();
         }
-        return "default";
+        return null;
     }
 
     /**

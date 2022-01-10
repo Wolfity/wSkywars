@@ -10,7 +10,7 @@ public abstract class Cosmetic implements Comparable<Cosmetic> {
     private final String name;
     private final ItemStack icon;
     private final CosmeticType cosmeticType;
-    private boolean enabled, isActive, unlocked;
+    private boolean enabled, isActive;
 
     public Cosmetic(final String name, final ItemStack icon, final int price, final CosmeticType cosmeticType) {
         this.name = name;
@@ -37,14 +37,6 @@ public abstract class Cosmetic implements Comparable<Cosmetic> {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public boolean isUnlocked() {
-        return unlocked;
-    }
-
-    public void setUnlocked(boolean unlocked) {
-        this.unlocked = unlocked;
     }
 
     public int getPrice() {

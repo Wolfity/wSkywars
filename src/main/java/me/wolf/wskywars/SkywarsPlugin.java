@@ -17,6 +17,7 @@ import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.scoreboard.SkywarsScoreboard;
 import me.wolf.wskywars.sql.SQLiteManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -95,7 +96,8 @@ public class SkywarsPlugin extends JavaPlugin {
                 new InventoryInteractions(this),
                 new MenuListener(playerManager),
                 new WinEffectListener(this),
-                new GameListeners(this)
+                new GameListeners(this),
+                new DamageListener(this)
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
     }
 

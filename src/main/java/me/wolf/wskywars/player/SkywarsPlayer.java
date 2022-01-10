@@ -166,6 +166,10 @@ public class SkywarsPlayer {
         this.tempKills++;
     }
 
+    public void resetTempKills() {
+        this.tempKills = 0;
+    }
+
     public int getTempKills() {
         return tempKills;
     }

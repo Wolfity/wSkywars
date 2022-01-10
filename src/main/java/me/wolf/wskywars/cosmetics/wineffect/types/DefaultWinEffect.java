@@ -12,10 +12,6 @@ public class DefaultWinEffect extends WinEffect {
         super("default", ItemUtils.createItem(Material.DIRT, "&cNone"), 0);
     }
 
-    @Override
-    public boolean isUnlocked() {
-        return true;
-    }
 
     @Override
     public void playEffect(Arena arena, SkywarsPlayer winner, SkywarsPlugin plugin) {

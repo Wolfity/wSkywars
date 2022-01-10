@@ -11,10 +11,6 @@ public class DefaultKillEffect extends KillEffect {
     }
 
 
-    @Override
-    public boolean isUnlocked() {
-        return true;
-    }
 
     @Override
     public void playKillEffect(SkywarsPlayer killedPlayer) {
