@@ -64,7 +64,8 @@ public class SQLiteManager {
      */
     public void createPlayerData(final UUID uuid, final String playerName) { // if the player exists, load their data, else create new data
         if (doesPlayerExist(uuid)) {
-            plugin.getPlayerManager().addSkywarsPlayer(uuid);
+//            plugin.getPlayerManager().addSkywarsPlayer(uuid);
+            plugin.getPlayerManager().getSkywarsPlayer(uuid).setCage(new Cage("defaultcage"));
             loadData(uuid);
         } else {
             try (final Connection connection = hikari.getConnection();
@@ -79,7 +80,7 @@ public class SQLiteManager {
                 ps.setString(7, "default");
                 ps.setString(8, "default");
 
-                plugin.getPlayerManager().addSkywarsPlayer(uuid);
+//                plugin.getPlayerManager().addSkywarsPlayer(uuid);
                 ps.executeUpdate();
 
             } catch (final SQLException e) {
@@ -94,7 +95,9 @@ public class SQLiteManager {
      */
     public void createCosmeticData(final UUID uuid) { // if the player exists, load their data, else create new data
         if (doesCosmeticPlayerExist(uuid)) {
+            plugin.getPlayerManager().addSkywarsPlayer(uuid);
             loadCosmeticData(uuid);
+
         } else {
             try (final Connection connection = hikari.getConnection();
                  final PreparedStatement ps = connection.prepareStatement(Query.CREATE_COSMETIC_DATA)) {
@@ -109,6 +112,7 @@ public class SQLiteManager {
             } catch (final SQLException e) {
                 e.printStackTrace();
             }
+            plugin.getPlayerManager().addSkywarsPlayer(uuid);
         }
     }
 
@@ -146,10 +150,11 @@ public class SQLiteManager {
         this.setData(uuid, DataType.COINS, this.getData(uuid, DataType.COINS));
         this.setActiveCosmetic(uuid, "activekilleffect", this.getActiveCosmetic(uuid, "activekilleffect"));
         this.setActiveCosmetic(uuid, "activewineffect", this.getActiveCosmetic(uuid, "activewineffect"));
+
         final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(uuid);
 
         skywarsPlayer.setActiveCosmetic(plugin.getWinEffectManager().getWinEffectByName(getActiveCosmetic(uuid, "activewineffect")));
-        skywarsPlayer.setActiveCosmetic(plugin.getWinEffectManager().getWinEffectByName(getActiveCosmetic(uuid, "activekilleffect")));
+        skywarsPlayer.setActiveCosmetic(plugin.getKillEffectManager().getKillEffectByName(getActiveCosmetic(uuid, "activekilleffect")));
         skywarsPlayer.setCoins(this.getData(uuid, DataType.COINS));
         skywarsPlayer.setWins(this.getData(uuid, DataType.WINS));
         skywarsPlayer.setKills(this.getData(uuid, DataType.KILLS));
@@ -164,6 +169,7 @@ public class SQLiteManager {
         this.setUnlockedCosmetics(uuid, "wineffects", this.getUnlockedCosmetics(uuid, "wineffects"));
         this.setUnlockedCosmetics(uuid, "killeffects", this.getUnlockedCosmetics(uuid, "killeffects"));
         final SkywarsPlayer player = plugin.getPlayerManager().getSkywarsPlayer(uuid);
+
 
         player.setUnlockedCosmetics(Stream.of(getUnlockedCosmetic(CosmeticType.KILLEFFECT, getUnlockedCosmetics(uuid, "killeffects")),
                         getUnlockedCosmetic(CosmeticType.WINEFFECT, getUnlockedCosmetics(uuid, "wineffects")))
@@ -291,7 +297,6 @@ public class SQLiteManager {
 
             ps.setString(1, uuid.toString());
             final ResultSet resultSet = ps.executeQuery();
-            System.out.println("ACTIVEEE type " + type + " HERE IS " + resultSet.getString(type));
             return resultSet.getString(type);
         } catch (final SQLException e) {
             e.printStackTrace();
@@ -366,5 +371,4 @@ public class SQLiteManager {
         }
         return cosmetics;
     }
-
 }

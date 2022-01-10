@@ -143,6 +143,21 @@ public class ArenaManager {
     }
 
     /**
+     * @param player the player we want to get the team of
+     * @return the Team object from the requested player
+     */
+    public Team getTeamByPlayer(final SkywarsPlayer player) {
+        for(final Arena arena : arenas) {
+            for(Team team : arena.getTeams()) {
+                if(team.getTeamMembers().contains(player)) {
+                    return team;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * @param arenaName delete the arena matching the arena name
      */
     public void deleteArena(final String arenaName) {
@@ -151,6 +166,12 @@ public class ArenaManager {
         arenas.remove(arena);
     }
 
+    /**
+     * @param mid the center of the map, pasted from that point of view
+     * @param name the name of the schematica (map name)
+     * @return whether the paste was successful or not
+     * @throws IOException if something goes wrong
+     */
     public boolean pasteMap(final Location mid, final String name) throws IOException {
         final File schem = new File("schematics/" + name + ".schem");
         if (schem.exists()) {

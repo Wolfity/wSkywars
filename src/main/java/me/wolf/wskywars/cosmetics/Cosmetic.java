@@ -4,6 +4,8 @@ import me.wolf.wskywars.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public abstract class Cosmetic implements Comparable<Cosmetic> {
 
     private final int price;

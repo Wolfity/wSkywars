@@ -14,7 +14,7 @@ public class WinEffectManager {
     private final Set<WinEffect> winEffects = new HashSet<>();
 
     public WinEffect getWinEffectByName(final String name) {
-        return winEffects.stream().filter(winEffect -> winEffect.getName().equalsIgnoreCase(name)).findFirst().orElse(new DefaultWinEffect());
+        return winEffects.stream().filter(winEffect -> winEffect.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     public void loadWinEffects(final YamlConfig cfg) {

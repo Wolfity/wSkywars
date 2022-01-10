@@ -217,11 +217,11 @@ public class SkywarsPlayer {
     }
 
     public KillEffect getActiveKillEffect() {
-        return (KillEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.KILLEFFECT).filter(Cosmetic::isActive).findFirst().orElse(new DefaultKillEffect());
+        return (KillEffect)  unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultKillEffect());
     }
 
     public WinEffect getActiveWinEffect() {
-        return (WinEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT).filter(Cosmetic::isActive).findFirst().orElse(new DefaultWinEffect());
+        return (WinEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultWinEffect());
     }
 
     public void setActiveCosmetic(final Cosmetic cosmetic) {

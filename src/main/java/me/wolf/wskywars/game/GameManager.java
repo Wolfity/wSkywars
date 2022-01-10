@@ -71,7 +71,6 @@ public class GameManager {
 
         player.sendMessage("&aSuccessfully left this game!");
 
-
         player.setPlayerState(PlayerState.IN_LOBBY);
         player.setSpectator(false);
         player.clearInventory();
@@ -144,10 +143,6 @@ public class GameManager {
 
         if (arena.getArenaState() == ArenaState.IN_GAME) {
             if (teamCount == 1) {
-                getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> {
-                    System.out.println(skywarsPlayer.getActiveWinEffect().getName());
-                    skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin);
-                });
                 getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin));
                 setGameState(game, GameState.END);
             }
@@ -166,10 +161,7 @@ public class GameManager {
 
         if (arena.getArenaState() == ArenaState.IN_GAME) {
             if (teamCount == 1) {
-                getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> {
-                    System.out.println(skywarsPlayer.getActiveWinEffect().getName());
-                    skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin);
-                });
+                if(getWinningTeam(arena) == null) return;
                 getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin));
                 setGameState(game, GameState.END);
             }
@@ -261,7 +253,6 @@ public class GameManager {
                         this.cancel();
                         arena.setGameTimer(arena.getArenaConfig().getInt("game-timer"));
                         setGameState(game, GameState.END);
-                        System.out.println("game countdown " + arena.getGameTimer());
                     }
                 }
             }
@@ -383,6 +374,7 @@ public class GameManager {
     }
 
     private void sendEndGameMessage(final Arena arena) {
+        if(getWinningTeam(arena) == null) return;
         arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> {
             skywarsPlayer.sendCenteredMessage(new String[]{
                     "&7---------------------------------",

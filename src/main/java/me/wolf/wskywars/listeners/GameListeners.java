@@ -31,6 +31,12 @@ public class GameListeners implements Listener {
         final SkywarsPlayer killed = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
         if (killed.getPlayerState() != PlayerState.IN_GAME) return;
 
+        if(event.getDamager() instanceof Player) {
+            final SkywarsPlayer damager = plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId());
+            if(plugin.getArenaManager().getTeamByPlayer(killed).getTeamMembers().contains(damager)) {
+                event.setCancelled(true);
+            }
+        }
 
         final Game game = plugin.getGameManager().getGameByPlayer(killed);
 
@@ -38,7 +44,6 @@ public class GameListeners implements Listener {
         if (event.getDamage() >= killed.getBukkitPlayer().getHealth()) {
             if (event.getDamager() instanceof Player) { // play kill effect
                 plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId()).getActiveKillEffect().playKillEffect(killed);
-                System.out.println("played " + plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId()).getActiveKillEffect().getName());
             }
             if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
                 plugin.getGameManager().handleGameKill(game, event.getDamager().getUniqueId(), killed);
