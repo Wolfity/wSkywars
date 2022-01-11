@@ -19,13 +19,20 @@ public class CageManager {
 
     private final Set<Cage> cages = new HashSet<>();
 
+    /**
+     * @param player the player the cage will be removed of when a game starts
+     * @throws IOException when something goes wrong
+     */
     public void removeCage(final SkywarsPlayer player) throws IOException {
         final EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(player.getWorld()));
         player.getActiveCage().getEditSession().undo(editSession);
         player.getActiveCage().setEditSession(null);
-
     }
 
+    /**
+     * @param cfg the cages config file
+     *            Method that loads in every cage in the yml file. Will throw an exception when the .schem file of the cage is not found
+     */
     public void loadCages(final YamlConfig cfg) {
         for (final String cage : cfg.getConfig().getConfigurationSection("cages").getKeys(false)) {
             final boolean enabled = cfg.getConfig().getBoolean("cages." + cage + ".enabled");
@@ -34,13 +41,15 @@ public class CageManager {
                 final String name = cfg.getConfig().getString("cages." + cage + ".icon-name");
                 final int price = cfg.getConfig().getInt("cages." + cage + ".price");
                 final ItemStack icon = ItemUtils.createItem(material, name);
+                // checking if the cage has a schematica file in the appropriate folder
                 final File schemFile = new File("skywarsschematics/cages/" + cage + ".schem");
-                if(schemFile.exists()) {
+                if (schemFile.exists()) {
                     cages.add(new Cage(cage, icon, price));
-                } else throw new CageFileNotFoundException("The .schem file " + cage + ".schem in skywarsschematics/cages was not found");
+                } else
+                    throw new CageFileNotFoundException("The .schem file " + cage + ".schem in skywarsschematics/cages was not found");
             }
         }
-        cages.add(new DefaultCage());
+        cages.add(new DefaultCage()); // always add the default cage
     }
 
     public Cage getCageByName(final String name) {

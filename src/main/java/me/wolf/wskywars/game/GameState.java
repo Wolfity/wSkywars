@@ -5,6 +5,7 @@ public enum GameState {
     READY,
     COUNTDOWN,
     INGAME,
-    END
+    END,
+    CLEANUP
 
 }

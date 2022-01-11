@@ -53,7 +53,9 @@ public class GameManager {
                 arena.setArenaState(ArenaState.IN_GAME);
                 arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.setPlayerState(PlayerState.IN_GAME)));
                 sendEndGameMessage(arena);
-                getWinningTeam(arena).getTeamMembers().forEach(SkywarsPlayer::addWin);
+                if (getWinningTeam(arena) != null) {
+                    getWinningTeam(arena).getTeamMembers().forEach(SkywarsPlayer::addWin);
+                }
                 Bukkit.getScheduler().runTaskLater(plugin, () -> cleanUp(game), 200L);
                 break;
 
@@ -88,24 +90,27 @@ public class GameManager {
                         (float) plugin.getConfig().getDouble("spawn.yaw")));
 
         if (!cleanUp) {
-            arena.getTeams().forEach(team -> {
-                team.getTeamMembers().remove(player);
-                if (team.getTeamMembers().size() == 0) arena.getTeams().remove(team); // full team eliminated
-            }); // removing the player from his team
+            final Team leaversTeam = plugin.getArenaManager().getTeamByPlayer(player);
+            leaversTeam.removeMember(player);
+            if (leaversTeam.getTeamMembers().size() == 0) arena.getTeams().remove(leaversTeam);
+
         }
 
-        if (arena.getTeams().size() <= 1) { // if there are either 1 or 0 teams left, depending on the game state, end the game, or cancel the cooldown
-            if (arena.getArenaState() == ArenaState.IN_GAME || arena.getTeams().size() == 0) {
-                setGameState(game, GameState.END);
 
-            } else if (arena.getTeams().size() < arena.getMinTeams()) { // lobby countdown
-                if (!cleanUp) { // we only want to send the message if the game isn't in cleanup mode
-                    arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.sendMessage("&cNot enough players, countdown cancelled!")));
+        if (arena.getTeams().size() <= 1) { // if there are either 1 or 0 teams left, depending on the game state, end the game, or cancel the cooldown
+            if (game.getGameState() == GameState.INGAME) {
+                setGameState(game, GameState.END);
+            } else if (game.getGameState() == GameState.COUNTDOWN) {
+                if (arena.getTeams().size() < arena.getMinTeams()) { // lobby countdown + there are less teams than required
+                    if (!cleanUp) { // we only want to send the message if the game isn't in cleanup mode
+                        arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.sendMessage("&cNot enough players, countdown cancelled!")));
+                    }
+                    setGameState(game, GameState.READY);
                 }
-                setGameState(game, GameState.READY);
                 arena.setCageCountdown(arena.getArenaConfig().getInt("cage-countdown"));
             }
         }
+
         player.setUpPlayer();
         player.resetTempKills();
         plugin.getScoreboard().lobbyScoreboard(player);
@@ -125,8 +130,15 @@ public class GameManager {
         // set the user to spectator mode
         killed.setSpectator(true);
         killed.getBukkitPlayer().setGameMode(GameMode.SPECTATOR);
-        final int teamCount = (int) arena.getTeams().stream().filter(team -> team.getTeamMembers().stream().filter(SkywarsPlayer::isSpectator).count() == arena.getTeamSize()).count();
 
+        int teamCount = arena.getTeams().size();
+
+        for (final Team team : arena.getTeams()) {
+            int spec = (int) team.getTeamMembers().stream().filter(SkywarsPlayer::isSpectator).count();
+            if (spec == team.getTeamMembers().size()) {
+                teamCount--;
+            }
+        }
 
         // if it's a player, make a SkywarsPlayer object
         if (Bukkit.getEntity(killer) instanceof Player) {
@@ -140,28 +152,41 @@ public class GameManager {
         final Entity finalKiller = Bukkit.getEntity(killer);
         arena.getTeams().forEach(aliveTeam -> aliveTeam.sendMessage("&6[!] &6" + killed.getDisplayName() + " &ewas killed by " + finalKiller.getName()));
 
-
+        // if there's only 1 alive team left, end the game
         if (arena.getArenaState() == ArenaState.IN_GAME) {
-            if (teamCount == 1) {
+            if (teamCount <= 1) {
                 getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin));
                 setGameState(game, GameState.END);
             }
         }
     }
 
+    /**
+     * @param game        the game someone was killed in
+     * @param killed      the killed SkywarsPlayer
+     * @param damageCause the last damage cause of the killed player
+     *                    Method that handles a player that was killed by something else than an entity
+     */
     public void handleGameKill(final Game game, final SkywarsPlayer killed, EntityDamageEvent.DamageCause damageCause) {
         final Arena arena = game.getArena();
 
         // set the user to spectator mode
         killed.setSpectator(true);
         killed.getBukkitPlayer().setGameMode(GameMode.SPECTATOR);
-        final int teamCount = (int) arena.getTeams().stream().filter(team -> team.getTeamMembers().stream().filter(SkywarsPlayer::isSpectator).count() == arena.getTeamSize()).count();
+
+        int teamCount = arena.getTeams().size();
+
+        for (final Team team : arena.getTeams()) {
+            int spec = (int) team.getTeamMembers().stream().filter(SkywarsPlayer::isSpectator).count();
+            if (spec == team.getTeamMembers().size()) {
+                teamCount--;
+            }
+        }
 
         arena.getTeams().forEach(aliveTeam -> aliveTeam.sendMessage("&6[!] &6" + killed.getDisplayName() + " &ewas killed by " + damageCause.name()));
 
         if (arena.getArenaState() == ArenaState.IN_GAME) {
-            if (teamCount == 1) {
-                if(getWinningTeam(arena) == null) return;
+            if (teamCount <= 1) {
                 getWinningTeam(arena).getTeamMembers().forEach(skywarsPlayer -> skywarsPlayer.getActiveWinEffect().playEffect(arena, skywarsPlayer, plugin));
                 setGameState(game, GameState.END);
             }
@@ -320,31 +345,34 @@ public class GameManager {
     }
 
     private void cleanUp(final Game game) {
-        final Arena arena = game.getArena();
+        if (game.getGameState() == GameState.END) {
+            setGameState(game, GameState.CLEANUP);
+            final Arena arena = game.getArena();
+            arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> {
+                leaveGame(skywarsPlayer, true);
+                skywarsPlayer.resetTempKills();
+            }));
+            arena.getTeams().clear();
+            arena.setGameTimer(arena.getArenaConfig().getInt("game-timer"));
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                        try {
+                            plugin.getArenaManager().pasteMap(arena.getCenter(), arena.getName());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    },
+                    20L);
 
-        arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> {
-            leaveGame(skywarsPlayer, true);
-            skywarsPlayer.resetTempKills();
-        }));
-        arena.getTeams().clear();
-        arena.setGameTimer(arena.getArenaConfig().getInt("game-timer"));
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    try {
-                        plugin.getArenaManager().pasteMap(arena.getCenter(), arena.getName());
-                        arena.setArenaState(ArenaState.RECRUITING);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                },
-                20L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> arena.setArenaState(ArenaState.RECRUITING), 60L);
 
-        games.remove(game);
+            games.remove(game);
+        }
     }
 
 
     /**
      * @param arena: The arena we want to get the game from
-     * @return a Game object
+     * @return a Game objecta
      * @throws NullPointerException if there is no game active with that arena
      */
     private Game getGameByArena(final Arena arena) {
@@ -359,6 +387,10 @@ public class GameManager {
         return games.stream().filter(game -> game.getGameState() == GameState.READY || game.getGameState() == GameState.COUNTDOWN).findFirst().orElse(null);
     }
 
+    /**
+     * @param arena the arena we are in
+     * @return a character representing the team's name.
+     */
     private char getTeamName(final Arena arena) {
         char i = (char) 65; // increase from 65 + 1, so it'll go from A -> B -> C, etc...
         i += arena.getTeams().stream().mapToInt(team -> (char) 1).sum();
@@ -374,7 +406,7 @@ public class GameManager {
     }
 
     private void sendEndGameMessage(final Arena arena) {
-        if(getWinningTeam(arena) == null) return;
+        if (getWinningTeam(arena) == null) return;
         arena.getTeams().forEach(team -> team.getTeamMembers().forEach(skywarsPlayer -> {
             skywarsPlayer.sendCenteredMessage(new String[]{
                     "&7---------------------------------",
@@ -389,6 +421,10 @@ public class GameManager {
         }));
     }
 
+    /**
+     * @param arena the arena we are looking to get the winning team of
+     * @return a Team object where atleast 1 player is alive when the game ends.
+     */
     private Team getWinningTeam(final Arena arena) {
         return arena.getTeams()
                 .stream()

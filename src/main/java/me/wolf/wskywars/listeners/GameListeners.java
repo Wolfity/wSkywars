@@ -33,6 +33,7 @@ public class GameListeners implements Listener {
 
         if(event.getDamager() instanceof Player) {
             final SkywarsPlayer damager = plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId());
+            if(plugin.getArenaManager().getTeamByPlayer(damager) == null) return;
             if(plugin.getArenaManager().getTeamByPlayer(killed).getTeamMembers().contains(damager)) {
                 event.setCancelled(true);
             }
@@ -83,6 +84,7 @@ public class GameListeners implements Listener {
         final SkywarsPlayer player = plugin.getPlayerManager().getSkywarsPlayer(event.getPlayer().getUniqueId());
         if(player.getPlayerState() != PlayerState.IN_GAME) return;
         final Arena arena = plugin.getArenaManager().getArenaByPlayer(player);
+        if(arena == null) return;
 
         event.setRespawnLocation(arena.getCenter());
     }

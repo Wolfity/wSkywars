@@ -42,10 +42,10 @@ public class SkywarsPlugin extends JavaPlugin {
     @Override
 
     public void onEnable() {
-        final File folder = new File(this.getDataFolder() + "/arenas");
         final File schemFolder = new File("skywarsschematics/cages");
-        if (!folder.exists()) folder.mkdirs();
+        final File folder = new File(this.getDataFolder() + "/arenas");
         if (!schemFolder.exists()) schemFolder.mkdirs();
+        if (!folder.exists()) folder.mkdirs();
 
 
         this.getConfig().options().copyDefaults();

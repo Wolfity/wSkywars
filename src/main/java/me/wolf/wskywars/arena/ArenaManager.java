@@ -173,7 +173,7 @@ public class ArenaManager {
      * @throws IOException if something goes wrong
      */
     public boolean pasteMap(final Location mid, final String name) throws IOException {
-        final File schem = new File("schematics/" + name + ".schem");
+        final File schem = new File("skywarsschematics/" + name + ".schem");
         if (schem.exists()) {
             ClipboardFormat format = ClipboardFormats.findByFile(schem);
             try (ClipboardReader reader = format.getReader(new FileInputStream(schem))) {
