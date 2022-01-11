@@ -9,3 +9,13 @@ cages:
     price: 100
     icon-material: DIAMOND_ORE
     icon-name: "&bOre Cage"
+  greenglass:
+    enabled: true
+    price: 100
+    icon-material: GREEN_STAINED_GLASS
+    icon-name: "&bGreen Class Cage"
+  blueglass:
+    enabled: true
+    price: 100
+    icon-material: BLUE_STAINED_GLASS
+    icon-name: "&bBlue Class Cage"

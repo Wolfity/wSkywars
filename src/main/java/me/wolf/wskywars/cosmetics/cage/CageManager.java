@@ -3,15 +3,14 @@ package me.wolf.wskywars.cosmetics.cage;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import me.wolf.wskywars.cosmetics.cage.types.DefaultCage;
-import me.wolf.wskywars.cosmetics.cage.types.OreCage;
-import me.wolf.wskywars.cosmetics.cage.types.PrisonCage;
+import me.wolf.wskywars.exception.CageFileNotFoundException;
 import me.wolf.wskywars.files.YamlConfig;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,15 +34,10 @@ public class CageManager {
                 final String name = cfg.getConfig().getString("cages." + cage + ".icon-name");
                 final int price = cfg.getConfig().getInt("cages." + cage + ".price");
                 final ItemStack icon = ItemUtils.createItem(material, name);
-
-                switch (cage) {
-                    case "prisoncage":
-                        cages.add(new PrisonCage(icon, price));
-                        break;
-                    case "orescage":
-                        cages.add(new OreCage(icon, price));
-                        break;
-                }
+                final File schemFile = new File("skywarsschematics/cages/" + cage + ".schem");
+                if(schemFile.exists()) {
+                    cages.add(new Cage(cage, icon, price));
+                } else throw new CageFileNotFoundException("The .schem file " + cage + ".schem in skywarsschematics/cages was not found");
             }
         }
         cages.add(new DefaultCage());

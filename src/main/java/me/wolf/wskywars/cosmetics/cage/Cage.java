@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public abstract class Cage extends Cosmetic {
+public class Cage extends Cosmetic {
 
     private EditSession editSession;
     private File schemFile;
@@ -49,11 +49,11 @@ public abstract class Cage extends Cosmetic {
     }
 
     public void pasteCage(final Location location) throws IOException {
-        setSchemFile(new File("schematics/cages/" + getName() + ".schem"));
+        setSchemFile(new File("skywarsschematics/cages/" + getName() + ".schem"));
 
         File schem = schemFile;
         if (!schem.exists()) {
-            schem = new File("schematics/cages/defaultcage.schem");
+            schem = new File("skywarsschematics/cages/defaultcage.schem");
         }
 
         ClipboardFormat format = ClipboardFormats.findByFile(schem);

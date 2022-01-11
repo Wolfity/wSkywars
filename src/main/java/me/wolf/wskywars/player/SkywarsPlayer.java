@@ -3,7 +3,7 @@ package me.wolf.wskywars.player;
 import me.wolf.wskywars.cosmetics.Cosmetic;
 import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.cosmetics.cage.Cage;
-import me.wolf.wskywars.cosmetics.cage.types.DefaultCage;
+import me.wolf.wskywars.cosmetics.cage.DefaultCage;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
 import me.wolf.wskywars.cosmetics.killeffect.types.DefaultKillEffect;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
