@@ -3,7 +3,6 @@ package me.wolf.wskywars.sql;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.wolf.wskywars.SkywarsPlugin;
-import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.cosmetics.Cosmetic;
 import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.player.SkywarsPlayer;
@@ -64,8 +63,6 @@ public class SQLiteManager {
      */
     public void createPlayerData(final UUID uuid, final String playerName) { // if the player exists, load their data, else create new data
         if (doesPlayerExist(uuid)) {
-//            plugin.getPlayerManager().addSkywarsPlayer(uuid);
-            plugin.getPlayerManager().getSkywarsPlayer(uuid).setCage(new Cage("defaultcage"));
             loadData(uuid);
         } else {
             try (final Connection connection = hikari.getConnection();
@@ -78,9 +75,8 @@ public class SQLiteManager {
                 ps.setInt(5, 0); // coins
                 ps.setString(6, "default");
                 ps.setString(7, "default");
-                ps.setString(8, "default");
+                ps.setString(8, "defaultcage");
 
-//                plugin.getPlayerManager().addSkywarsPlayer(uuid);
                 ps.executeUpdate();
 
             } catch (final SQLException e) {
@@ -105,7 +101,7 @@ public class SQLiteManager {
                 ps.setString(1, uuid.toString());
                 ps.setString(2, "default");
                 ps.setString(3, "default");
-                ps.setString(4, "default");
+                ps.setString(4, "defaultcage");
 
                 ps.executeUpdate();
 
@@ -129,6 +125,7 @@ public class SQLiteManager {
 
         this.setActiveCosmetic(uuid, "activekilleffect", player.getActiveKillEffect().getName());
         this.setActiveCosmetic(uuid, "activewineffect", player.getActiveWinEffect().getName());
+        this.setActiveCosmetic(uuid, "activecage", player.getActiveCage().getName());
     }
 
     /**
@@ -138,6 +135,7 @@ public class SQLiteManager {
         final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(uuid);
         this.setUnlockedCosmetics(uuid, "wineffects", getCosmeticSetToString(skywarsPlayer.getUnlockedCosmetics(), CosmeticType.WINEFFECT));
         this.setUnlockedCosmetics(uuid, "killeffects", getCosmeticSetToString(skywarsPlayer.getUnlockedCosmetics(), CosmeticType.KILLEFFECT));
+        this.setUnlockedCosmetics(uuid, "cages", getCosmeticSetToString(skywarsPlayer.getUnlockedCosmetics(), CosmeticType.CAGE));
     }
 
     /**
@@ -150,16 +148,16 @@ public class SQLiteManager {
         this.setData(uuid, DataType.COINS, this.getData(uuid, DataType.COINS));
         this.setActiveCosmetic(uuid, "activekilleffect", this.getActiveCosmetic(uuid, "activekilleffect"));
         this.setActiveCosmetic(uuid, "activewineffect", this.getActiveCosmetic(uuid, "activewineffect"));
-
+        this.setActiveCosmetic(uuid, "activecage", this.getActiveCosmetic(uuid, "activecage"));
         final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(uuid);
 
         skywarsPlayer.setActiveCosmetic(plugin.getWinEffectManager().getWinEffectByName(getActiveCosmetic(uuid, "activewineffect")));
         skywarsPlayer.setActiveCosmetic(plugin.getKillEffectManager().getKillEffectByName(getActiveCosmetic(uuid, "activekilleffect")));
+        skywarsPlayer.setActiveCosmetic(plugin.getCageManager().getCageByName(getActiveCosmetic(uuid, "activecage")));
         skywarsPlayer.setCoins(this.getData(uuid, DataType.COINS));
         skywarsPlayer.setWins(this.getData(uuid, DataType.WINS));
         skywarsPlayer.setKills(this.getData(uuid, DataType.KILLS));
 
-        skywarsPlayer.setCage(new Cage("defaultcage"));
     }
 
     /**
@@ -168,11 +166,13 @@ public class SQLiteManager {
     private void loadCosmeticData(final UUID uuid) {
         this.setUnlockedCosmetics(uuid, "wineffects", this.getUnlockedCosmetics(uuid, "wineffects"));
         this.setUnlockedCosmetics(uuid, "killeffects", this.getUnlockedCosmetics(uuid, "killeffects"));
+        this.setUnlockedCosmetics(uuid, "cages", this.getUnlockedCosmetics(uuid, "cages"));
         final SkywarsPlayer player = plugin.getPlayerManager().getSkywarsPlayer(uuid);
 
 
         player.setUnlockedCosmetics(Stream.of(getUnlockedCosmetic(CosmeticType.KILLEFFECT, getUnlockedCosmetics(uuid, "killeffects")),
-                        getUnlockedCosmetic(CosmeticType.WINEFFECT, getUnlockedCosmetics(uuid, "wineffects")))
+                        getUnlockedCosmetic(CosmeticType.WINEFFECT, getUnlockedCosmetics(uuid, "wineffects")),
+                        getUnlockedCosmetic(CosmeticType.CAGE, getUnlockedCosmetics(uuid, "cages")))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet()));
     }
@@ -355,7 +355,7 @@ public class SQLiteManager {
 
     /**
      * @param cosmetic the cosmetic type we are getting the unlocked of
-     * @param data the data String
+     * @param data     the data String
      * @return a Set of the requested cosmetic
      */
     private Set<Cosmetic> getUnlockedCosmetic(final CosmeticType cosmetic, final String data) {
@@ -367,6 +367,9 @@ public class SQLiteManager {
                 break;
             case WINEFFECT:
                 Arrays.stream(data.split(" ")).forEach(entry -> cosmetics.add(plugin.getWinEffectManager().getWinEffectByName(entry)));
+                break;
+            case CAGE:
+                Arrays.stream(data.split(" ")).forEach(entry -> cosmetics.add(plugin.getCageManager().getCageByName(entry)));
                 break;
         }
         return cosmetics;

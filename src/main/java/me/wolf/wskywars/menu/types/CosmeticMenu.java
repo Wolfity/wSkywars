@@ -17,6 +17,7 @@ public class CosmeticMenu extends SkywarsMenu {
 
 
         final List<Cosmetic> allCosmetic = Stream.of(plugin.getKillEffectManager().getKillEffects(),
+                plugin.getCageManager().getCages(),
                 plugin.getWinEffectManager().getWinEffects()).flatMap(Collection::stream).sorted().collect(Collectors.toList());
 
         switch (cosmeticType) {
@@ -44,8 +45,19 @@ public class CosmeticMenu extends SkywarsMenu {
                         addItem(cosmetic.getLockedIcon(), player -> new PurchaseMenu(owner, cosmetic, plugin.getScoreboard()));
                 });
                 break;
+            case CAGE:
+                allCosmetic.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.CAGE).forEach(cosmetic -> {
+                    if (owner.getUnlockedCosmetics().contains(cosmetic) || cosmetic.getName().equalsIgnoreCase("default")) {
+                        addItem(cosmetic.getIcon(), player -> {
+                            owner.setActiveCosmetic(cosmetic);
+                            owner.sendMessage("&aSuccessfully set " + cosmetic.getName() + " to active!");
+                            plugin.getScoreboard().lobbyScoreboard(owner);
+                        });
+                    } else
+                        addItem(cosmetic.getLockedIcon(), player -> new PurchaseMenu(owner, cosmetic, plugin.getScoreboard()));
+                });
+                break;
         }
-
 
         openSkywarsMenu(owner);
     }

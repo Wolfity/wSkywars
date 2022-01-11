@@ -1,0 +1,11 @@
+cages:
+  prisoncage:
+    enabled: true
+    price: 150
+    icon-material: IRON_BARS
+    icon-name: "&7Prison Cage"
+  orescage:
+    enabled: true
+    price: 100
+    icon-material: DIAMOND_ORE
+    icon-name: "&bOre Cage"

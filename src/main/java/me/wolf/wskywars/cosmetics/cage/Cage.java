@@ -1,4 +1,4 @@
-package me.wolf.wskywars.cage;
+package me.wolf.wskywars.cosmetics.cage;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -13,20 +13,45 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import me.wolf.wskywars.cosmetics.Cosmetic;
+import me.wolf.wskywars.cosmetics.CosmeticType;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class CageManager {
+public abstract class Cage extends Cosmetic {
 
+    private EditSession editSession;
+    private File schemFile;
 
-    public void pasteCage(final Location location, final Cage cage) throws IOException {
-        cage.setSchemFile(new File("schematics/cages/" + cage.getName() + ".schem"));
+    public Cage(String name, ItemStack icon, int price) {
+        super(name, icon, price, CosmeticType.CAGE);
+    }
 
-        File schem = cage.getSchemFile();
+    public EditSession getEditSession() {
+        return editSession;
+    }
+
+    public void setEditSession(EditSession editSession) {
+        this.editSession = editSession;
+    }
+
+    public File getSchemFile() {
+        return schemFile;
+    }
+
+    public void setSchemFile(File schemFile) {
+        this.schemFile = schemFile;
+    }
+
+    public void pasteCage(final Location location) throws IOException {
+        setSchemFile(new File("schematics/cages/" + getName() + ".schem"));
+
+        File schem = schemFile;
         if (!schem.exists()) {
             schem = new File("schematics/cages/defaultcage.schem");
         }
@@ -37,7 +62,7 @@ public class CageManager {
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(new BukkitWorld(location.getWorld()))) {
                 editSession.getChangeSet().setRecordChanges(true); // allow changes (enable/undo)
-                cage.setEditSession(editSession);
+                setEditSession(editSession);
 
                 final Operation operation = new ClipboardHolder(clipboard)
                         .createPaste(editSession)
@@ -50,12 +75,5 @@ public class CageManager {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void removeCage(final SkywarsPlayer player) throws IOException {
-        final EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(player.getWorld()));
-        player.getCage().getEditSession().undo(editSession);
-        player.getCage().setEditSession(null);
-
     }
 }

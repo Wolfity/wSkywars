@@ -42,6 +42,7 @@ public class InventoryInteractions implements Listener {
                 new CosmeticMenu(player, CosmeticType.WINEFFECT, plugin);
                 break;
             case GREEN_STAINED_GLASS:
+                new CosmeticMenu(player, CosmeticType.CAGE, plugin);
                 break;
         }
     }

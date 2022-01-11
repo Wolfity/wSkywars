@@ -45,7 +45,6 @@ public class KillEffectManager {
                         killEffects.add(new NoteKillEffect(icon, price));
                         break;
                 }
-
             }
         }
         killEffects.add(new DefaultKillEffect());

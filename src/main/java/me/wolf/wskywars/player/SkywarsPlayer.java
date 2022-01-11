@@ -1,8 +1,9 @@
 package me.wolf.wskywars.player;
 
-import me.wolf.wskywars.cage.Cage;
 import me.wolf.wskywars.cosmetics.Cosmetic;
 import me.wolf.wskywars.cosmetics.CosmeticType;
+import me.wolf.wskywars.cosmetics.cage.Cage;
+import me.wolf.wskywars.cosmetics.cage.types.DefaultCage;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffect;
 import me.wolf.wskywars.cosmetics.killeffect.types.DefaultKillEffect;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffect;
@@ -28,7 +29,6 @@ public class SkywarsPlayer {
     private int wins, kills, coins, tempKills;
     private boolean isSpectator;
     private PlayerState playerState;
-    private Cage cage;
     private Set<Cosmetic> unlockedCosmetics;
 
 
@@ -43,14 +43,6 @@ public class SkywarsPlayer {
         this.unlockedCosmetics = new HashSet<>();
     }
 
-
-    public Cage getCage() {
-        return cage;
-    }
-
-    public void setCage(Cage cage) {
-        this.cage = cage;
-    }
 
     public Set<Cosmetic> getUnlockedCosmetics() {
         return unlockedCosmetics;
@@ -217,11 +209,15 @@ public class SkywarsPlayer {
     }
 
     public KillEffect getActiveKillEffect() {
-        return (KillEffect)  unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultKillEffect());
+        return (KillEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.KILLEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultKillEffect());
     }
 
     public WinEffect getActiveWinEffect() {
         return (WinEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultWinEffect());
+    }
+
+    public Cage getActiveCage() {
+        return (Cage) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.CAGE && cosmetic.isActive()).findFirst().orElse(new DefaultCage());
     }
 
     public void setActiveCosmetic(final Cosmetic cosmetic) {
@@ -232,6 +228,10 @@ public class SkywarsPlayer {
                 break;
             case WINEFFECT:
                 getActiveWinEffect().setActive(false);
+                cosmetic.setActive(true);
+                break;
+            case CAGE:
+                getActiveCage().setActive(false);
                 cosmetic.setActive(true);
                 break;
         }

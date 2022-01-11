@@ -228,7 +228,7 @@ public class GameManager {
         for (int i = 0; i < arena.getTeams().size(); i++) {
             player.teleport(arena.getSpawnLocations().get(i));
             try {
-                plugin.getCageManager().pasteCage(arena.getSpawnLocations().get(i), player.getCage());
+                player.getActiveCage().pasteCage(arena.getSpawnLocations().get(i));
             } catch (final IOException e) {
                 e.printStackTrace();
             }

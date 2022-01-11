@@ -4,7 +4,6 @@ import me.wolf.wskywars.utils.ItemUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Objects;
 
 public abstract class Cosmetic implements Comparable<Cosmetic> {
 
@@ -12,7 +11,7 @@ public abstract class Cosmetic implements Comparable<Cosmetic> {
     private final String name;
     private final ItemStack icon;
     private final CosmeticType cosmeticType;
-    private boolean enabled, isActive;
+    private boolean isActive;
 
     public Cosmetic(final String name, final ItemStack icon, final int price, final CosmeticType cosmeticType) {
         this.name = name;
@@ -31,14 +30,6 @@ public abstract class Cosmetic implements Comparable<Cosmetic> {
 
     public void setActive(boolean active) {
         isActive = active;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     public int getPrice() {

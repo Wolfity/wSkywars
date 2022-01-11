@@ -30,45 +30,50 @@ public class SkywarsScoreboard {
         header.addEntry(Utils.colorize("&7Header :)"));
         header.setPrefix("");
         header.setSuffix("");
-        objective.getScore(Utils.colorize("&7Header :) ")).setScore(7);
+        objective.getScore(Utils.colorize("&7Header :) ")).setScore(8);
 
 
         final Team wins = scoreboard.registerNewTeam("wins");
         wins.addEntry(Utils.colorize("&8Wins: "));
         wins.setPrefix("");
         wins.setSuffix(Utils.colorize("&e " + player.getWins()));
-        objective.getScore(Utils.colorize("&8Wins: ")).setScore(6);
+        objective.getScore(Utils.colorize("&8Wins: ")).setScore(7);
 
         final Team kills = scoreboard.registerNewTeam("kills");
         kills.addEntry(Utils.colorize("&8Kills: "));
         kills.setPrefix("");
         kills.setSuffix(Utils.colorize("&e " + player.getKills()));
-        objective.getScore(Utils.colorize("&8Kills: ")).setScore(5);
+        objective.getScore(Utils.colorize("&8Kills: ")).setScore(6);
 
         final Team coins = scoreboard.registerNewTeam("coins");
         coins.addEntry(Utils.colorize("&8Coins: "));
         coins.setPrefix("");
         coins.setSuffix(Utils.colorize("&e " + player.getCoins()));
-        objective.getScore(Utils.colorize("&8Coins: ")).setScore(4);
+        objective.getScore(Utils.colorize("&8Coins: ")).setScore(5);
 
         final Team empty1 = scoreboard.registerNewTeam("empty1");
         empty1.addEntry(" ");
         empty1.setPrefix("");
         empty1.setSuffix("");
-        objective.getScore(" ").setScore(3);
+        objective.getScore(" ").setScore(4);
 
         final Team killeffect = scoreboard.registerNewTeam("killeffect");
         killeffect.addEntry(Utils.colorize("&7Kill Effect: &e"));
         killeffect.setPrefix("");
         killeffect.setSuffix(player.getActiveKillEffect().getName());
-        objective.getScore(Utils.colorize("&7Kill Effect: &e")).setScore(2);
+        objective.getScore(Utils.colorize("&7Kill Effect: &e")).setScore(3);
 
         final Team wineffect = scoreboard.registerNewTeam("wineffect");
         wineffect.addEntry(Utils.colorize("&7Win Effect: &e"));
         wineffect.setPrefix("");
         wineffect.setSuffix(player.getActiveWinEffect().getName());
-        objective.getScore(Utils.colorize("&7Win Effect: &e")).setScore(1);
+        objective.getScore(Utils.colorize("&7Win Effect: &e")).setScore(2);
 
+        final Team cage = scoreboard.registerNewTeam("cage");
+        cage.addEntry(Utils.colorize("&7Cage: &e"));
+        cage.setPrefix("");
+        cage.setSuffix(player.getActiveCage().getName());
+        objective.getScore(Utils.colorize("&7Cage: &e")).setScore(1);
 
         player.getBukkitPlayer().setScoreboard(scoreboard);
     }

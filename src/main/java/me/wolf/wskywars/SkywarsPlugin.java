@@ -2,7 +2,7 @@ package me.wolf.wskywars;
 
 
 import me.wolf.wskywars.arena.ArenaManager;
-import me.wolf.wskywars.cage.CageManager;
+import me.wolf.wskywars.cosmetics.cage.CageManager;
 import me.wolf.wskywars.chest.SkywarsChestManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffectManager;
@@ -17,7 +17,6 @@ import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.scoreboard.SkywarsScoreboard;
 import me.wolf.wskywars.sql.SQLiteManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -115,6 +114,7 @@ public class SkywarsPlugin extends JavaPlugin {
         this.killEffectManager = new KillEffectManager();
         this.winEffectManager = new WinEffectManager();
 
+        cageManager.loadCages(fileManager.getCagesConfig());
         winEffectManager.loadWinEffects(fileManager.getWinEffectsConfig());
         killEffectManager.loadKillEffects(fileManager.getKillEffectsConfig());
         skywarsChestManager.loadChestItems(fileManager.getChestItemsConfig());
