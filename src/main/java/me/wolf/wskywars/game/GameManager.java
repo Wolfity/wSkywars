@@ -326,10 +326,6 @@ public class GameManager {
                     if (arena.getCageCountdown() > 0) {
                         arena.decrementCageCountDown();
                         arena.getTeams().forEach(team -> team.sendMessage("&eThe game will start in " + arena.getCageCountdown()));
-                        for (final Team team : arena.getTeams()) {
-                            for (final SkywarsPlayer player : team.getTeamMembers()) {
-                            }
-                        }
                     } else {
                         this.cancel(); // resetting the countdown and updating the game state
                         arena.setCageCountdown(arena.getArenaConfig().getInt("cage-countdown"));
@@ -343,11 +339,13 @@ public class GameManager {
                                     "",
                                     "&7---------------------------------------"});
                             team.getTeamMembers().forEach(player -> {
+                                plugin.getPlayerManager().getCageDropDown().add(player); // adding to the anti fall damage map for 5 sec
                                 try {
                                     plugin.getCageManager().removeCage(player);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
+                                Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getPlayerManager().getCageDropDown().remove(player), 100L);
                             });
                         });
 

@@ -40,7 +40,7 @@ public class GameListeners implements Listener {
 
         final Game game = plugin.getGameManager().getGameByPlayer(killed);
 
-
+        // the entity takes more damage then it has HP (dies), cancel the event
         if (event.getDamage() >= killed.getBukkitPlayer().getHealth()) {
             if (event.getDamager() instanceof Player) { // play kill effect
                 plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId()).getActiveKillEffect().playKillEffect(killed);
@@ -87,6 +87,16 @@ public class GameListeners implements Listener {
         if (arena == null) return;
 
         event.setRespawnLocation(arena.getCenter());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST) // cancel fall damage when a player drops out of their cage
+    public void onCageFallDamage(EntityDamageEvent event) {
+        if(!(event.getEntity() instanceof Player)) return;
+        final SkywarsPlayer player = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
+        if(player.getPlayerState() != PlayerState.IN_GAME) return;
+        final Arena arena = plugin.getArenaManager().getArenaByPlayer(player);
+        if(arena == null) return;
+        event.setCancelled(event.getCause() == EntityDamageEvent.DamageCause.FALL &&plugin.getPlayerManager().getCageDropDown().contains(player));
     }
 
 }

@@ -18,10 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class SkywarsPlayer {
 
@@ -30,7 +27,7 @@ public class SkywarsPlayer {
     private boolean isSpectator;
     private PlayerState playerState;
     private Set<Cosmetic> unlockedCosmetics;
-
+    private final Map<CosmeticType, Cosmetic> activeCosmetics;
 
     // creating a first time object
     public SkywarsPlayer(final UUID uuid) {
@@ -41,6 +38,7 @@ public class SkywarsPlayer {
         this.isSpectator = false;
         this.playerState = PlayerState.IN_LOBBY;
         this.unlockedCosmetics = new HashSet<>();
+        this.activeCosmetics = new HashMap<>();
 
     }
 
@@ -210,33 +208,30 @@ public class SkywarsPlayer {
     }
 
     public KillEffect getActiveKillEffect() {
-        return (KillEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.KILLEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultKillEffect());
-
+        if (activeCosmetics.get(CosmeticType.KILLEFFECT) == null) return new DefaultKillEffect();
+        return (KillEffect) activeCosmetics.get(CosmeticType.KILLEFFECT);
     }
 
     public WinEffect getActiveWinEffect() {
-        return (WinEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultWinEffect());
-
+        if (activeCosmetics.get(CosmeticType.WINEFFECT) == null) return new DefaultWinEffect();
+        return (WinEffect) activeCosmetics.get(CosmeticType.WINEFFECT);
     }
 
     public Cage getActiveCage() {
-        return (Cage) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.CAGE && cosmetic.isActive()).findFirst().orElse(new DefaultCage());
-
+        if (activeCosmetics.get(CosmeticType.CAGE) == null) return new DefaultCage();
+        return (Cage) activeCosmetics.get(CosmeticType.CAGE);
     }
 
     public void setActiveCosmetic(final Cosmetic cosmetic) {
         switch (cosmetic.getCosmeticType()) {
             case KILLEFFECT:
-                getActiveKillEffect().setActive(false);
-                cosmetic.setActive(true);
+                this.activeCosmetics.put(CosmeticType.KILLEFFECT, cosmetic);
                 break;
             case WINEFFECT:
-                getActiveWinEffect().setActive(false);
-                cosmetic.setActive(true);
+                this.activeCosmetics.put(CosmeticType.WINEFFECT, cosmetic);
                 break;
             case CAGE:
-                getActiveCage().setActive(false);
-                cosmetic.setActive(true);
+                this.activeCosmetics.put(CosmeticType.CAGE, cosmetic);
                 break;
         }
     }
@@ -260,4 +255,3 @@ public class SkywarsPlayer {
         return Objects.hash(uuid);
     }
 }
-

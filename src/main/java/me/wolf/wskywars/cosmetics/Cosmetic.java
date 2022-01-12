@@ -24,14 +24,6 @@ public abstract class Cosmetic implements Comparable<Cosmetic> {
         return cosmeticType;
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
     public int getPrice() {
         return price;
     }

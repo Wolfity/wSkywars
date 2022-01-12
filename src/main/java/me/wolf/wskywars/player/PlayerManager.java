@@ -1,13 +1,11 @@
 package me.wolf.wskywars.player;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerManager {
 
     private final Map<UUID, SkywarsPlayer> skywarsPlayers = new HashMap<>();
-
+    private final Set<SkywarsPlayer> cageDropDown = new HashSet<>();
     /**
      * @param uuid: the SkywarsPlayer value matching the UUID key
      * @return a SkywarsPlayer object if it exists
@@ -32,4 +30,7 @@ public class PlayerManager {
         return skywarsPlayers;
     }
 
+    public Set<SkywarsPlayer> getCageDropDown() {
+        return cageDropDown;
+    }
 }

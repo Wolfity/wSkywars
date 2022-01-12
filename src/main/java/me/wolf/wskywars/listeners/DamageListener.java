@@ -17,13 +17,14 @@ public class DamageListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler // disable damage when players are not ingame
     public void onNoGameDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         final SkywarsPlayer damaged = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
         event.setCancelled(damaged.getPlayerState() != PlayerState.IN_GAME);
     }
 
+    // cancel natural damage causes when not ingame
     @EventHandler
     public void onNaturalDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
