@@ -147,9 +147,9 @@ public class ArenaManager {
      * @return the Team object from the requested player
      */
     public Team getTeamByPlayer(final SkywarsPlayer player) {
-        for(final Arena arena : arenas) {
-            for(Team team : arena.getTeams()) {
-                if(team.getTeamMembers().contains(player)) {
+        for (final Arena arena : arenas) {
+            for (Team team : arena.getTeams()) {
+                if (team.getTeamMembers().contains(player)) {
                     return team;
                 }
             }
@@ -167,7 +167,7 @@ public class ArenaManager {
     }
 
     /**
-     * @param mid the center of the map, pasted from that point of view
+     * @param mid  the center of the map, pasted from that point of view
      * @param name the name of the schematica (map name)
      * @return whether the paste was successful or not
      * @throws IOException if something goes wrong

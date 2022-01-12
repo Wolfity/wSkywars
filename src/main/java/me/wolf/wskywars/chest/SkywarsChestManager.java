@@ -53,7 +53,7 @@ public class SkywarsChestManager {
         arena.getChests().forEach(skywarsChest -> {
             skywarsChest.getLocation().getBlock().setType(Material.CHEST);
             final Chest chest = (Chest) skywarsChest.getLocation().getBlock().getState();
-            if(!hasEnoughAvailableSlots(chest.getInventory(), skywarsChest.getItemsPerChest())) return;
+            if (!hasEnoughAvailableSlots(chest.getInventory(), skywarsChest.getItemsPerChest())) return;
 
             for (int i = 0; i < skywarsChest.getItemsPerChest(); i++) {
                 chest.getInventory().setItem(getRandomSlot(chest.getInventory()), getRandomItem(skywarsChest.getChestType()).getItem());

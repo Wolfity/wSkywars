@@ -14,9 +14,10 @@ public class WinEffectManager {
     private final Set<WinEffect> winEffects = new HashSet<>();
 
     public WinEffect getWinEffectByName(final String name) {
-        return winEffects.stream().filter(winEffect -> winEffect.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return winEffects.stream().filter(winEffect -> winEffect.getName().equalsIgnoreCase(name)).findFirst().orElse(new DefaultWinEffect());
     }
 
+    // loading all the win effects
     public void loadWinEffects(final YamlConfig cfg) {
         for (final String effect : cfg.getConfig().getConfigurationSection("win-effects").getKeys(false)) {
             final boolean enabled = cfg.getConfig().getBoolean("win-effects." + effect + ".enabled");
@@ -48,7 +49,6 @@ public class WinEffectManager {
         }
         winEffects.add(new DefaultWinEffect());
     }
-
 
     public Set<WinEffect> getWinEffects() {
         return winEffects;

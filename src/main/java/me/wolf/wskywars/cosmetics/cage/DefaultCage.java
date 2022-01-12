@@ -1,6 +1,5 @@
 package me.wolf.wskywars.cosmetics.cage;
 
-import me.wolf.wskywars.cosmetics.cage.Cage;
 import me.wolf.wskywars.utils.ItemUtils;
 import org.bukkit.Material;
 

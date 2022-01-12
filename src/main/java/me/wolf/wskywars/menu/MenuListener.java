@@ -35,7 +35,6 @@ public class MenuListener implements Listener {
 
         if (clickAction == null) return;
         clickAction.click(skywarsPlayer.getBukkitPlayer());
-
     }
 
     @EventHandler

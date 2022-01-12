@@ -2,9 +2,9 @@ package me.wolf.wskywars;
 
 
 import me.wolf.wskywars.arena.ArenaManager;
-import me.wolf.wskywars.cosmetics.cage.CageManager;
 import me.wolf.wskywars.chest.SkywarsChestManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
+import me.wolf.wskywars.cosmetics.cage.CageManager;
 import me.wolf.wskywars.cosmetics.killeffect.KillEffectManager;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffectListener;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffectManager;
@@ -20,6 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -55,6 +56,15 @@ public class SkywarsPlugin extends JavaPlugin {
         registerListeners();
         registerCommands();
 
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                playerManager.getSkywarsPlayers().values().forEach(p -> {
+                    System.out.println(p.getName() + " activekill " + p.getActiveKillEffect());
+                    System.out.println(p.getName() + " activewwin " + p.getActiveWinEffect() + "\n");
+                });
+            }
+        }.runTaskTimer(this, 0, 20);
 
     }
 

@@ -7,6 +7,7 @@ public enum DataType {
     WINS("wins");
 
     private final String dataString;
+
     DataType(final String s) {
         this.dataString = s;
     }

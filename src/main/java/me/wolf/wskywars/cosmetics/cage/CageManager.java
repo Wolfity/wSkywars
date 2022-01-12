@@ -2,15 +2,27 @@ package me.wolf.wskywars.cosmetics.cage;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import me.wolf.wskywars.exception.CageFileNotFoundException;
 import me.wolf.wskywars.files.YamlConfig;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.utils.ItemUtils;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +38,6 @@ public class CageManager {
     public void removeCage(final SkywarsPlayer player) throws IOException {
         final EditSession editSession = WorldEdit.getInstance().newEditSession(BukkitAdapter.adapt(player.getWorld()));
         player.getActiveCage().getEditSession().undo(editSession);
-        player.getActiveCage().setEditSession(null);
     }
 
     /**
@@ -52,9 +63,42 @@ public class CageManager {
         cages.add(new DefaultCage()); // always add the default cage
     }
 
+
+    public void pasteCage(final SkywarsPlayer player, final Location location) throws IOException {
+        final Cage cage = player.getActiveCage();
+        cage.setSchemFile(new File("skywarsschematics/cages/" + cage.getName() + ".schem"));
+
+        File schem = cage.getSchemFile();
+        System.out.println("schem file FOR USER " + player.getName() + "        " + schem);
+        if (!schem.exists()) {
+            schem = new File("skywarsschematics/cages/defaultcage.schem");
+        }
+
+        ClipboardFormat format = ClipboardFormats.findByFile(schem);
+        try (ClipboardReader reader = format.getReader(new FileInputStream(schem))) {
+            Clipboard clipboard = reader.read();
+
+            try (EditSession editSession = WorldEdit.getInstance().newEditSession(new BukkitWorld(location.getWorld()))) {
+                editSession.getChangeSet().setRecordChanges(true); // allow changes (enable/undo)
+                cage.setEditSession(editSession);
+                System.out.println("Just set edit session " + cage.getEditSession());
+                final Operation operation = new ClipboardHolder(clipboard)
+                        .createPaste(editSession)
+                        .to(BlockVector3.at(location.getX(), location.getY(), location.getZ()))
+                        .ignoreAirBlocks(false)
+                        .build();
+                Operations.complete(operation);
+
+            } catch (WorldEditException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public Cage getCageByName(final String name) {
         return cages.stream().filter(cage -> cage.getName().equalsIgnoreCase(name)).findFirst().orElse(new DefaultCage());
     }
+
 
     public Set<Cage> getCages() {
         return cages;

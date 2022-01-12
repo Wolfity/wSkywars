@@ -12,7 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -31,10 +30,10 @@ public class GameListeners implements Listener {
         final SkywarsPlayer killed = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
         if (killed.getPlayerState() != PlayerState.IN_GAME) return;
 
-        if(event.getDamager() instanceof Player) {
+        if (event.getDamager() instanceof Player) {
             final SkywarsPlayer damager = plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId());
-            if(plugin.getArenaManager().getTeamByPlayer(damager) == null) return;
-            if(plugin.getArenaManager().getTeamByPlayer(killed).getTeamMembers().contains(damager)) {
+            if (plugin.getArenaManager().getTeamByPlayer(damager) == null) return;
+            if (plugin.getArenaManager().getTeamByPlayer(killed).getTeamMembers().contains(damager)) {
                 event.setCancelled(true);
             }
         }
@@ -68,7 +67,8 @@ public class GameListeners implements Listener {
         final SkywarsPlayer killed = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
         if (killed.getPlayerState() != PlayerState.IN_GAME) return;
 
-        if (event.getEntity().getLastDamageCause() == null) return; // damage cause isnt null + wasn't by an entity attack
+        if (event.getEntity().getLastDamageCause() == null)
+            return; // damage cause isnt null + wasn't by an entity attack
         if (event.getEntity().getLastDamageCause().getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             plugin.getGameManager().handleGameKill(plugin.getGameManager().getGameByPlayer(killed), killed, event.getEntity().getLastDamageCause().getCause());
 
@@ -82,9 +82,9 @@ public class GameListeners implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         final SkywarsPlayer player = plugin.getPlayerManager().getSkywarsPlayer(event.getPlayer().getUniqueId());
-        if(player.getPlayerState() != PlayerState.IN_GAME) return;
+        if (player.getPlayerState() != PlayerState.IN_GAME) return;
         final Arena arena = plugin.getArenaManager().getArenaByPlayer(player);
-        if(arena == null) return;
+        if (arena == null) return;
 
         event.setRespawnLocation(arena.getCenter());
     }

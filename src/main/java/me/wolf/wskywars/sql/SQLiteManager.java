@@ -350,6 +350,9 @@ public class SQLiteManager {
         final StringBuilder sb = new StringBuilder();
         cosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == type).forEach(cosmetic -> sb.append(cosmetic.getName()).append(" "));
 
+        if (sb.length() == 0) {
+            sb.append("default");
+        }
         return sb.toString();
     }
 

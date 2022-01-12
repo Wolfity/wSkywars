@@ -23,6 +23,7 @@ public class DamageListener implements Listener {
         final SkywarsPlayer damaged = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
         event.setCancelled(damaged.getPlayerState() != PlayerState.IN_GAME);
     }
+
     @EventHandler
     public void onNaturalDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) return;

@@ -31,4 +31,5 @@ public class PlayerManager {
     public Map<UUID, SkywarsPlayer> getSkywarsPlayers() {
         return skywarsPlayers;
     }
+
 }

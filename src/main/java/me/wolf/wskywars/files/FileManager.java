@@ -3,7 +3,6 @@ package me.wolf.wskywars.files;
 import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 
 public class FileManager {
 

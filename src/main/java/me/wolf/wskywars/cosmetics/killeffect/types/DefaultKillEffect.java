@@ -11,7 +11,6 @@ public class DefaultKillEffect extends KillEffect {
     }
 
 
-
     @Override
     public void playKillEffect(SkywarsPlayer killedPlayer) {
 

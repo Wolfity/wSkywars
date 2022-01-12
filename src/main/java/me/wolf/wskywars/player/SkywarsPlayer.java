@@ -41,6 +41,7 @@ public class SkywarsPlayer {
         this.isSpectator = false;
         this.playerState = PlayerState.IN_LOBBY;
         this.unlockedCosmetics = new HashSet<>();
+
     }
 
 
@@ -210,14 +211,17 @@ public class SkywarsPlayer {
 
     public KillEffect getActiveKillEffect() {
         return (KillEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.KILLEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultKillEffect());
+
     }
 
     public WinEffect getActiveWinEffect() {
         return (WinEffect) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.WINEFFECT && cosmetic.isActive()).findFirst().orElse(new DefaultWinEffect());
+
     }
 
     public Cage getActiveCage() {
         return (Cage) unlockedCosmetics.stream().filter(cosmetic -> cosmetic.getCosmeticType() == CosmeticType.CAGE && cosmetic.isActive()).findFirst().orElse(new DefaultCage());
+
     }
 
     public void setActiveCosmetic(final Cosmetic cosmetic) {
