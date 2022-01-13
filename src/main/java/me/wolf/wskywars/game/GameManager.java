@@ -6,6 +6,7 @@ import me.wolf.wskywars.arena.ArenaState;
 import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.team.Team;
+import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -268,12 +269,33 @@ public class GameManager {
                 e.printStackTrace();
             }
         }
+        setUpTab(player);
         player.clearInventory();
         player.setUpPlayer();
         if (arena.getTeams().size() == arena.getMinTeams()) {
             setGameState(game, GameState.COUNTDOWN);
             startLobbyCountdown(game);
         }
+    }
+
+    private void setUpTab(final SkywarsPlayer skywarsPlayer) {
+        final Arena arena = plugin.getArenaManager().getArenaByPlayer(skywarsPlayer);
+        skywarsPlayer.getBukkitPlayer()
+                .setPlayerListName(Utils.colorize("&c[" + plugin.getArenaManager().getTeamByPlayer(skywarsPlayer) + "] " + skywarsPlayer.getDisplayName()));
+
+        for (final Team team : arena.getTeams()) {
+            for(final SkywarsPlayer skywarsPlayer1 : team.getTeamMembers()) { // all arena players
+                for(final Player bukkitPlayer2 : Bukkit.getOnlinePlayers()) {
+                    final SkywarsPlayer skywarsPlayer2 = plugin.getPlayerManager().getSkywarsPlayer(bukkitPlayer2.getUniqueId());
+                    if(!plugin.getArenaManager().doesArenaContainPlayer(arena, skywarsPlayer2)) {
+
+                        skywarsPlayer2.getBukkitPlayer().hidePlayer(plugin, skywarsPlayer1.getBukkitPlayer());
+                        skywarsPlayer1.getBukkitPlayer().hidePlayer(plugin, skywarsPlayer2.getBukkitPlayer());
+                    }
+                }
+            }
+        }
+
     }
 
     private void startGameTimer(final Game game) {

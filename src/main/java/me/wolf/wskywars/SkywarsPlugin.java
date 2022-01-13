@@ -55,16 +55,7 @@ public class SkywarsPlugin extends JavaPlugin {
         registerManagers();
         registerListeners();
         registerCommands();
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                playerManager.getSkywarsPlayers().values().forEach(p -> {
-                    System.out.println(p.getName() + " activekill " + p.getActiveKillEffect());
-                    System.out.println(p.getName() + " activewwin " + p.getActiveWinEffect() + "\n");
-                });
-            }
-        }.runTaskTimer(this, 0, 20);
+        
 
     }
 

@@ -11,7 +11,6 @@ public abstract class Cosmetic implements Comparable<Cosmetic> {
     private final String name;
     private final ItemStack icon;
     private final CosmeticType cosmeticType;
-    private boolean isActive;
 
     public Cosmetic(final String name, final ItemStack icon, final int price, final CosmeticType cosmeticType) {
         this.name = name;

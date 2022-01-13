@@ -158,6 +158,15 @@ public class ArenaManager {
     }
 
     /**
+     * @param arena  the arena we want to check
+     * @param player the player we want to check
+     * @return true if the player is in said arena, false if not
+     */
+    public boolean doesArenaContainPlayer(final Arena arena, final SkywarsPlayer player) {
+        return arena.getTeams().stream().anyMatch(team -> team.getTeamMembers().contains(player));
+    }
+
+    /**
      * @param arenaName delete the arena matching the arena name
      */
     public void deleteArena(final String arenaName) {
