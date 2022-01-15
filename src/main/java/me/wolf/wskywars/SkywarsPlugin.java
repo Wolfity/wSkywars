@@ -1,6 +1,7 @@
 package me.wolf.wskywars;
 
 
+import me.wolf.wskywars.arena.Arena;
 import me.wolf.wskywars.arena.ArenaManager;
 import me.wolf.wskywars.chest.SkywarsChestManager;
 import me.wolf.wskywars.commands.SkywarsCommand;
@@ -9,16 +10,20 @@ import me.wolf.wskywars.cosmetics.killeffect.KillEffectManager;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffectListener;
 import me.wolf.wskywars.cosmetics.wineffect.WinEffectManager;
 import me.wolf.wskywars.files.FileManager;
+import me.wolf.wskywars.game.Game;
 import me.wolf.wskywars.game.GameManager;
+import me.wolf.wskywars.game.GameState;
 import me.wolf.wskywars.listeners.*;
 import me.wolf.wskywars.menu.MenuListener;
 import me.wolf.wskywars.player.PlayerManager;
+import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.scoreboard.SkywarsScoreboard;
 import me.wolf.wskywars.sql.SQLiteManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -55,7 +60,6 @@ public class SkywarsPlugin extends JavaPlugin {
         registerManagers();
         registerListeners();
         registerCommands();
-        
 
     }
 
@@ -160,4 +164,7 @@ public class SkywarsPlugin extends JavaPlugin {
     public WinEffectManager getWinEffectManager() {
         return winEffectManager;
     }
+
 }
+
+

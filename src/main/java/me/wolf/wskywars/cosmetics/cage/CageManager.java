@@ -77,7 +77,6 @@ public class CageManager {
         if (!schem.exists()) {
             schem = new File("skywarsschematics/cages/defaultcage.schem");
         }
-
         ClipboardFormat format = ClipboardFormats.findByFile(schem);
         try (ClipboardReader reader = format.getReader(new FileInputStream(schem))) {
             Clipboard clipboard = reader.read();

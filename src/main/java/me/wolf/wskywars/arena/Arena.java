@@ -2,6 +2,7 @@ package me.wolf.wskywars.arena;
 
 import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.chest.SkywarsChest;
+import me.wolf.wskywars.player.SkywarsPlayer;
 import me.wolf.wskywars.team.Team;
 import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -11,6 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Arena {
 
@@ -152,6 +154,10 @@ public class Arena {
 
     public void decrementGameTimer() {
         this.gameTimer--;
+    }
+
+    public Set<SkywarsPlayer> getAllPlayers() {
+        return teams.stream().flatMap(team -> team.getTeamMembers().stream()).collect(Collectors.toSet());
     }
 
     /**

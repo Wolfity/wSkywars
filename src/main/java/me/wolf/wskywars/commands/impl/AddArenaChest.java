@@ -18,7 +18,7 @@ public class AddArenaChest extends SubCommand {
 
     @Override
     protected String getUsage() {
-        return "&e/sw addchest <arena>  <island/mid>";
+        return "&e/sw addchest <arena> <island/mid>";
     }
 
     @Override

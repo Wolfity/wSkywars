@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GameManager {
 
@@ -81,20 +82,14 @@ public class GameManager {
         player.resetHunger();
         player.getBukkitPlayer().setGameMode(GameMode.SURVIVAL);
 
-
-        player.teleport( // teleport to the skywars spawn
-                new Location(Bukkit.getWorld(Objects.requireNonNull(plugin.getConfig().getString("spawn.world"))),
-                        plugin.getConfig().getDouble("spawn.x"),
-                        plugin.getConfig().getDouble("spawn.y"),
-                        plugin.getConfig().getDouble("spawn.z"),
-                        (float) plugin.getConfig().getDouble("spawn.pitch"),
-                        (float) plugin.getConfig().getDouble("spawn.yaw")));
+        if(plugin.getConfig().getString("spawn") == null) {
+            player.sendMessage("&cSkywars Hub was not set! Could not teleport you!");
+        } else player.teleport(Utils.stringToLoc(plugin.getConfig().getString("spawn"))); // teleport to the skywars spawn
 
         if (!cleanUp) {
             final Team leaversTeam = plugin.getArenaManager().getTeamByPlayer(player);
             leaversTeam.removeMember(player);
             if (leaversTeam.getTeamMembers().size() == 0) arena.getTeams().remove(leaversTeam);
-
         }
 
 
@@ -112,6 +107,7 @@ public class GameManager {
             }
         }
 
+        player.getBukkitPlayer().setPlayerListName(player.getDisplayName());
         player.setUpPlayer();
         player.resetTempKills();
         plugin.getScoreboard().lobbyScoreboard(player);
@@ -144,9 +140,17 @@ public class GameManager {
         // if it's a player, make a SkywarsPlayer object
         if (Bukkit.getEntity(killer) instanceof Player) {
             final SkywarsPlayer humanKiller = plugin.getPlayerManager().getSkywarsPlayer(killer);
-            humanKiller.setCoins(humanKiller.getCoins() + 50);
             humanKiller.addTempKill(); // temp kill (game only)
             humanKiller.addKill();  // permanent DB kill
+
+            final int amt = ThreadLocalRandom.current().nextInt(plugin.getConfig().getInt("min-coins-per-kill"),
+                    plugin.getConfig().getInt("max-coins-per-kill"));
+
+
+            humanKiller.sendMessage("&c[!] &eYou gained " +
+                    amt + " coins!");
+
+            humanKiller.setCoins(humanKiller.getCoins() + amt);
         }
 
         // send the alert to the arena
@@ -269,33 +273,15 @@ public class GameManager {
                 e.printStackTrace();
             }
         }
-        setUpTab(player);
+        player.getBukkitPlayer()
+                .setPlayerListName(Utils.colorize("&c[" + plugin.getArenaManager().getTeamByPlayer(player).getName() + "] " + player.getDisplayName()));
+
         player.clearInventory();
         player.setUpPlayer();
         if (arena.getTeams().size() == arena.getMinTeams()) {
             setGameState(game, GameState.COUNTDOWN);
             startLobbyCountdown(game);
         }
-    }
-
-    private void setUpTab(final SkywarsPlayer skywarsPlayer) {
-        final Arena arena = plugin.getArenaManager().getArenaByPlayer(skywarsPlayer);
-        skywarsPlayer.getBukkitPlayer()
-                .setPlayerListName(Utils.colorize("&c[" + plugin.getArenaManager().getTeamByPlayer(skywarsPlayer) + "] " + skywarsPlayer.getDisplayName()));
-
-        for (final Team team : arena.getTeams()) {
-            for(final SkywarsPlayer skywarsPlayer1 : team.getTeamMembers()) { // all arena players
-                for(final Player bukkitPlayer2 : Bukkit.getOnlinePlayers()) {
-                    final SkywarsPlayer skywarsPlayer2 = plugin.getPlayerManager().getSkywarsPlayer(bukkitPlayer2.getUniqueId());
-                    if(!plugin.getArenaManager().doesArenaContainPlayer(arena, skywarsPlayer2)) {
-
-                        skywarsPlayer2.getBukkitPlayer().hidePlayer(plugin, skywarsPlayer1.getBukkitPlayer());
-                        skywarsPlayer1.getBukkitPlayer().hidePlayer(plugin, skywarsPlayer2.getBukkitPlayer());
-                    }
-                }
-            }
-        }
-
     }
 
     private void startGameTimer(final Game game) {

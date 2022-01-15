@@ -42,6 +42,8 @@ public class GameListeners implements Listener {
 
         // the entity takes more damage then it has HP (dies), cancel the event
         if (event.getDamage() >= killed.getBukkitPlayer().getHealth()) {
+            event.setCancelled(true);
+
             if (event.getDamager() instanceof Player) { // play kill effect
                 plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId()).getActiveKillEffect().playKillEffect(killed);
             }
@@ -58,12 +60,12 @@ public class GameListeners implements Listener {
             }
             // clear inv
             killed.getInventory().clear();
-            event.setCancelled(true);
+
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onEntityFallDeath(PlayerDeathEvent event) {
+    public void onNaturalDeath(PlayerDeathEvent event) {
         final SkywarsPlayer killed = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
         if (killed.getPlayerState() != PlayerState.IN_GAME) return;
 
@@ -73,7 +75,7 @@ public class GameListeners implements Listener {
             plugin.getGameManager().handleGameKill(plugin.getGameManager().getGameByPlayer(killed), killed, event.getEntity().getLastDamageCause().getCause());
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> { // respawn
-                ((Player) event.getEntity()).spigot().respawn();
+                event.getEntity().spigot().respawn();
             }, 10L);
 
         }
@@ -91,12 +93,18 @@ public class GameListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST) // cancel fall damage when a player drops out of their cage
     public void onCageFallDamage(EntityDamageEvent event) {
-        if(!(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player)) return;
         final SkywarsPlayer player = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
-        if(player.getPlayerState() != PlayerState.IN_GAME) return;
+        if (player.getPlayerState() != PlayerState.IN_GAME) return;
         final Arena arena = plugin.getArenaManager().getArenaByPlayer(player);
-        if(arena == null) return;
-        event.setCancelled(event.getCause() == EntityDamageEvent.DamageCause.FALL &&plugin.getPlayerManager().getCageDropDown().contains(player));
+        if (arena == null) return;
+
+        event.setCancelled(event.getCause() == EntityDamageEvent.DamageCause.FALL && plugin.getPlayerManager().getCageDropDown().contains(player));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST) // clear default death message
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        event.setDeathMessage("");
     }
 
 }

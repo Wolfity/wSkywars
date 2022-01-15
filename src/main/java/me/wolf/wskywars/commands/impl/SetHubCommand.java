@@ -3,6 +3,7 @@ package me.wolf.wskywars.commands.impl;
 import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.commands.SubCommand;
 import me.wolf.wskywars.player.SkywarsPlayer;
+import me.wolf.wskywars.utils.Utils;
 
 public class SetHubCommand extends SubCommand {
     @Override
@@ -24,12 +25,7 @@ public class SetHubCommand extends SubCommand {
     protected void executeCommand(SkywarsPlayer player, String[] args, SkywarsPlugin plugin) {
         if (isAdmin(player)) {
             if (args.length == 1) {
-                plugin.getConfig().set("spawn.world", player.getWorld().getName());
-                plugin.getConfig().set("spawn.x", player.getX());
-                plugin.getConfig().set("spawn.y", player.getY());
-                plugin.getConfig().set("spawn.z", player.getZ());
-                plugin.getConfig().set("spawn.pitch", player.getPitch());
-                plugin.getConfig().set("spawn.yaw", player.getYaw());
+                plugin.getConfig().set("spawn", Utils.locToString(player.getLocation()));
                 plugin.saveConfig();
                 player.sendMessage("&aSuccessfully set the hub!");
             } else player.sendMessage(getUsage());

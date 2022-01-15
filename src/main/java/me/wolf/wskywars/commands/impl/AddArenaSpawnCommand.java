@@ -11,12 +11,12 @@ import java.io.IOException;
 public class AddArenaSpawnCommand extends SubCommand {
     @Override
     protected String getCommandName() {
-        return "addSpawn";
+        return "addspawn";
     }
 
     @Override
     protected String getUsage() {
-        return "&e/sw addSpawn <arenaName>";
+        return "&e/sw addspawn <arenaName>";
     }
 
     @Override
