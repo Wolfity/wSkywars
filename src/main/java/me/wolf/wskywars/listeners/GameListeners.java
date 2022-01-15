@@ -3,6 +3,7 @@ package me.wolf.wskywars.listeners;
 import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.arena.Arena;
 import me.wolf.wskywars.game.Game;
+import me.wolf.wskywars.game.GameState;
 import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
 import org.bukkit.Bukkit;
@@ -29,6 +30,7 @@ public class GameListeners implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
         final SkywarsPlayer killed = plugin.getPlayerManager().getSkywarsPlayer(event.getEntity().getUniqueId());
         if (killed.getPlayerState() != PlayerState.IN_GAME) return;
+
 
         if (event.getDamager() instanceof Player) {
             final SkywarsPlayer damager = plugin.getPlayerManager().getSkywarsPlayer(event.getDamager().getUniqueId());
@@ -71,6 +73,7 @@ public class GameListeners implements Listener {
 
         if (event.getEntity().getLastDamageCause() == null)
             return; // damage cause isnt null + wasn't by an entity attack
+
         if (event.getEntity().getLastDamageCause().getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             plugin.getGameManager().handleGameKill(plugin.getGameManager().getGameByPlayer(killed), killed, event.getEntity().getLastDamageCause().getCause());
 
@@ -99,7 +102,11 @@ public class GameListeners implements Listener {
         final Arena arena = plugin.getArenaManager().getArenaByPlayer(player);
         if (arena == null) return;
 
-        event.setCancelled(event.getCause() == EntityDamageEvent.DamageCause.FALL && plugin.getPlayerManager().getCageDropDown().contains(player));
+        // cancel if they just got spawned (cage fall dmg) OR if the game ends (launcher win effect can cause fall damage)
+        event.setCancelled(plugin.getPlayerManager().getCageDropDown().contains(player) && event.getCause()
+                == EntityDamageEvent.DamageCause.FALL || plugin.getGameManager().getGameByPlayer(player).getGameState() == GameState.END);
+
+
     }
 
     @EventHandler(priority = EventPriority.HIGHEST) // clear default death message

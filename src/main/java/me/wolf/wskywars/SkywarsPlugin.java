@@ -61,6 +61,13 @@ public class SkywarsPlugin extends JavaPlugin {
         registerListeners();
         registerCommands();
 
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            for (final SkywarsPlayer player : playerManager.getSkywarsPlayers().values()) {
+                sqLiteManager.saveData(player.getUuid());
+                sqLiteManager.saveCosmeticData(player.getUuid());
+            }
+        },6000, 12000);
+
     }
 
     @Override

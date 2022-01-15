@@ -28,8 +28,6 @@ public class PurchaseMenu extends SkywarsMenu {
         player.setCoins(player.getCoins() - cosmetic.getPrice());
         player.unlockCosmetic(cosmetic);
         player.sendMessage("&aSuccessfully purchased this cosmetic!");
-        player.sendMessage("&eOld Balance &6" + (player.getCoins() + cosmetic.getPrice()) + "\n" +
-                "&eNew Balance &6 " + player.getCoins());
 
         scoreboard.lobbyScoreboard(player); // update the scoreboard
 

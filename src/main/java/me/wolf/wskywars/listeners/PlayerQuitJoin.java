@@ -3,6 +3,7 @@ package me.wolf.wskywars.listeners;
 import me.wolf.wskywars.SkywarsPlugin;
 import me.wolf.wskywars.player.PlayerState;
 import me.wolf.wskywars.player.SkywarsPlayer;
+import me.wolf.wskywars.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,8 +30,12 @@ public class PlayerQuitJoin implements Listener {
         // won't be null, since the object is created on join
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             final SkywarsPlayer skywarsPlayer = plugin.getPlayerManager().getSkywarsPlayer(player.getUniqueId());
-            plugin.getScoreboard().lobbyScoreboard(skywarsPlayer);
-            skywarsPlayer.giveLobbyInventory();
+            if(skywarsPlayer == null) {
+                event.getPlayer().kickPlayer(Utils.colorize("&cData Wasn't Loaded correctly, please rejoin!"));
+            } else {
+                plugin.getScoreboard().lobbyScoreboard(skywarsPlayer);
+                skywarsPlayer.giveLobbyInventory();
+            }
         }, 5L);
 
     }
